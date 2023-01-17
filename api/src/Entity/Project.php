@@ -38,6 +38,12 @@ class Project
     #[ORM\OneToOne(mappedBy: 'project', cascade: ['persist', 'remove'])]
     private ?Invoice $invoice = null;
 
+    #[ORM\Column]
+    private ?int $minPrice = null;
+
+    #[ORM\Column]
+    private ?int $maxPrice = null;
+
     public function __construct()
     {
         $this->filters = new ArrayCollection();
@@ -155,6 +161,30 @@ class Project
         }
 
         $this->invoice = $invoice;
+
+        return $this;
+    }
+
+    public function getMinPrice(): ?float
+    {
+        return $this->minPrice;
+    }
+
+    public function setMinPrice(float $minPrice): self
+    {
+        $this->minPrice = $minPrice;
+
+        return $this;
+    }
+
+    public function getMaxPrice(): ?int
+    {
+        return $this->maxPrice;
+    }
+
+    public function setMaxPrice(int $maxPrice): self
+    {
+        $this->maxPrice = $maxPrice;
 
         return $this;
     }
