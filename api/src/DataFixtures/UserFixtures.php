@@ -17,6 +17,8 @@ class UserFixtures extends Fixture
         
         $pwd = '$2y$13$ysK58wrGjIQyag8ZN31pzeVRMUmWga5wTNav7kgyts0gKCUGegSa.';
         $object=(new User)
+            ->setName('user')
+            ->setSurname('user')
             ->setEmail("user@user.com")
             ->setPassword($pwd)
             ->setCreatedAt($faker->dateTimeBetween('-1 year', '-1 day'))
@@ -24,6 +26,8 @@ class UserFixtures extends Fixture
         $manager->persist($object);
 
         $object=(new User)
+            ->setName('director')
+            ->setSurname('director')
             ->setEmail("director@director.com")
             ->setPassword($pwd)
             ->setRoles(["ROLE_DIRECTOR"])
@@ -32,6 +36,8 @@ class UserFixtures extends Fixture
         $manager->persist($object);
 
         $object=(new User)
+            ->setName('admin')
+            ->setSurname('admin')
             ->setEmail("admin@admin.com")
             ->setPassword($pwd)
             ->setRoles(["ROLE_ADMIN"])

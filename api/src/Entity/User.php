@@ -122,7 +122,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    private ?bool $isVerified = null;
+    private ?bool $isVerified = false;
 
     #[ORM\OneToOne(mappedBy: 'client', cascade: ['persist', 'remove'])]
     private ?ClientInfo $clientInfo = null;
