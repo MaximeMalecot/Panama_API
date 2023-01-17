@@ -25,6 +25,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use App\Entity\Traits\TimestampableTrait;
 
 #[ApiResource]
 #[Get(
@@ -80,6 +81,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[UniqueEntity('email', message: 'Email déjà utilisé')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    use TimestampableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
@@ -108,17 +111,43 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private ?string $oldPassword = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Gedmo\Timestampable(on: 'create')]
-    private ?\DateTimeInterface $createdAt = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["user_resetPwd", "user_changePwd"])]
     private ?string $resetPwdToken = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $surname = null;
+
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    private ?bool $isVerified = null;
+
+    #[ORM\OneToOne(mappedBy: 'client', cascade: ['persist', 'remove'])]
+    private ?ClientInfo $clientInfo = null;
+
+    #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
+    private ?FreelancerInfo $freelancerInfo = null;
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Project::class, orphanRemoval: true)]
+    private Collection $createdProjects;
+
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Proposition::class, orphanRemoval: true)]
+    private Collection $propositions;
+
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Invoice::class, orphanRemoval: true)]
+    private Collection $invoices;
+
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: SocialLink::class, orphanRemoval: true)]
+    private Collection $socialLinks;
+
     public function __construct()
     {
-        $this->pizzas = new ArrayCollection();
+        $this->createdProjects = new ArrayCollection();
+        $this->propositions = new ArrayCollection();
+        $this->invoices = new ArrayCollection();
+        $this->socialLinks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -191,18 +220,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
@@ -235,6 +252,196 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setResetPwdToken(?string $resetPwdToken): self
     {
         $this->resetPwdToken = $resetPwdToken;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getSurname(): ?string
+    {
+        return $this->surname;
+    }
+
+    public function setSurname(string $surname): self
+    {
+        $this->surname = $surname;
+
+        return $this;
+    }
+
+    public function isIsVerified(): ?bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): self
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getClientInfo(): ?ClientInfo
+    {
+        return $this->clientInfo;
+    }
+
+    public function setClientInfo(ClientInfo $clientInfo): self
+    {
+        // set the owning side of the relation if necessary
+        if ($clientInfo->getClient() !== $this) {
+            $clientInfo->setClient($this);
+        }
+
+        $this->clientInfo = $clientInfo;
+
+        return $this;
+    }
+
+    public function getFreelancerInfo(): ?FreelancerInfo
+    {
+        return $this->freelancerInfo;
+    }
+
+    public function setFreelancerInfo(FreelancerInfo $freelancerInfo): self
+    {
+        // set the owning side of the relation if necessary
+        if ($freelancerInfo->getFreelancer() !== $this) {
+            $freelancerInfo->setFreelancer($this);
+        }
+
+        $this->freelancerInfo = $freelancerInfo;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getCreatedProjects(): Collection
+    {
+        return $this->createdProjects;
+    }
+
+    public function addCreatedProject(Project $createdProject): self
+    {
+        if (!$this->createdProjects->contains($createdProject)) {
+            $this->createdProjects[] = $createdProject;
+            $createdProject->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedProject(Project $createdProject): self
+    {
+        if ($this->createdProjects->removeElement($createdProject)) {
+            // set the owning side to null (unless already changed)
+            if ($createdProject->getOwner() === $this) {
+                $createdProject->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Proposition>
+     */
+    public function getPropositions(): Collection
+    {
+        return $this->propositions;
+    }
+
+    public function addProposition(Proposition $proposition): self
+    {
+        if (!$this->propositions->contains($proposition)) {
+            $this->propositions[] = $proposition;
+            $proposition->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProposition(Proposition $proposition): self
+    {
+        if ($this->propositions->removeElement($proposition)) {
+            // set the owning side to null (unless already changed)
+            if ($proposition->getClient() === $this) {
+                $proposition->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Invoice>
+     */
+    public function getInvoices(): Collection
+    {
+        return $this->invoices;
+    }
+
+    public function addInvoice(Invoice $invoice): self
+    {
+        if (!$this->invoices->contains($invoice)) {
+            $this->invoices[] = $invoice;
+            $invoice->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvoice(Invoice $invoice): self
+    {
+        if ($this->invoices->removeElement($invoice)) {
+            // set the owning side to null (unless already changed)
+            if ($invoice->getClient() === $this) {
+                $invoice->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SocialLink>
+     */
+    public function getSocialLinks(): Collection
+    {
+        return $this->socialLinks;
+    }
+
+    public function addSocialLink(SocialLink $socialLink): self
+    {
+        if (!$this->socialLinks->contains($socialLink)) {
+            $this->socialLinks[] = $socialLink;
+            $socialLink->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSocialLink(SocialLink $socialLink): self
+    {
+        if ($this->socialLinks->removeElement($socialLink)) {
+            // set the owning side to null (unless already changed)
+            if ($socialLink->getCreator() === $this) {
+                $socialLink->setCreator(null);
+            }
+        }
 
         return $this;
     }
