@@ -24,7 +24,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Create false .env to test docker image
         run: |
-          cp .env.example .env
+          cp ./api/.env.example ./api/.env
 
       - name: Build and push
         uses: docker/build-push-action@v3
