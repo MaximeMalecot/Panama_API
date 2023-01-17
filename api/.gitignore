@@ -1,5 +1,5 @@
 /docker/db/data
-
+/.env
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -8,6 +8,7 @@
 /public/bundles/
 /var/
 /vendor/
+/migrations/
 ###< symfony/framework-bundle ###
 
 ###> friendsofphp/php-cs-fixer ###
