@@ -142,6 +142,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: SocialLink::class, orphanRemoval: true)]
     private Collection $socialLinks;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $gravatarImage = null;
+
     public function __construct()
     {
         $this->createdProjects = new ArrayCollection();
@@ -442,6 +445,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $socialLink->setCreator(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getGravatarImage(): ?string
+    {
+        return $this->gravatarImage;
+    }
+
+    public function setGravatarImage(?string $gravatarImage): self
+    {
+        $this->gravatarImage = $gravatarImage;
 
         return $this;
     }
