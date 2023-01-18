@@ -194,6 +194,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setRoles(array $roles): self
     {
+        foreach($roles as $role) {
+            if(!in_array($role, ['ROLE_ADMIN', 'ROLE_CLIENT', 'ROLE_FREELANCER', 'ROLE_FREELANCER_PREMIUM', 'ROLE_USER'])) {
+                throw new \InvalidArgumentException('Invalid role');
+            }
+        }
         $this->roles = $roles;
 
         return $this;

@@ -25,15 +25,15 @@ class UserFixtures extends Fixture
             ;
         $manager->persist($object);
 
-        $object=(new User)
-            ->setName('director')
-            ->setSurname('director')
-            ->setEmail("director@director.com")
-            ->setPassword($pwd)
-            ->setRoles(["ROLE_DIRECTOR"])
-            ->setCreatedAt($faker->dateTimeBetween('-1 year', '-1 day'))
-            ;
-        $manager->persist($object);
+        // $object=(new User)
+        //     ->setName('director')
+        //     ->setSurname('director')
+        //     ->setEmail("director@director.com")
+        //     ->setPassword($pwd)
+        //     ->setRoles(["ROLE_DIRECTOR"])
+        //     ->setCreatedAt($faker->dateTimeBetween('-1 year', '-1 day'))
+        //     ;
+        // $manager->persist($object);
 
         $object=(new User)
             ->setName('admin')
