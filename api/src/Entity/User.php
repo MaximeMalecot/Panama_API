@@ -3,16 +3,20 @@
 namespace App\Entity;
 
 use App\Entity\Pizza;
-use Gedmo\Mapping\Annotation as Gedmo;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
+use App\Dto\UserVerifyEmailDto;
 use Doctrine\ORM\Mapping as ORM;
 use App\Dto\UserResetPasswordDto;
 use App\Repository\UserRepository;
 use ApiPlatform\Metadata\ApiResource;
+use App\Controller\RegisterController;
+use Gedmo\Mapping\Annotation as Gedmo;
 use ApiPlatform\Metadata\GetCollection;
+use App\State\UserVerifyEmailProcessor;
+use App\Entity\Traits\TimestampableTrait;
 use App\State\UserResetPasswordProcessor;
 use App\Controller\ResetPasswordController;
 use Doctrine\Common\Collections\Collection;
@@ -25,7 +29,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use App\Entity\Traits\TimestampableTrait;
 
 #[ApiResource]
 #[Get(
@@ -40,7 +43,7 @@ use App\Entity\Traits\TimestampableTrait;
 )]
 #[Patch(
         name: 'forgot_password', 
-        uriTemplate: '/users/forgot-password', 
+        uriTemplate: '/users/forgot_password', 
         controller: ResetPasswordController::class,
         denormalizationContext: [
             'groups' => ['user_resetPwd_request']
@@ -52,11 +55,19 @@ use App\Entity\Traits\TimestampableTrait;
 ]
 #[Patch(
     name: 'resetPwd', 
-    uriTemplate: '/users/updatePwd', 
+    uriTemplate: '/users/update_password', 
     input: UserResetPasswordDto::class,
     output: User::class,
     processor: UserResetPasswordProcessor::class
 )]
+#[Patch(
+    name: 'verify_email',
+    uriTemplate: '/users/verify_email',
+    input: UserVerifyEmailDto::class,
+    output: User::class,
+    processor: UserVerifyEmailProcessor::class
+)]
+
 #[Put(
     security: "is_granted('ROLE_ADMIN') or object.getOwner() == user",
     denormalizationContext: [
@@ -68,12 +79,13 @@ use App\Entity\Traits\TimestampableTrait;
 )]
 #[Post(
     name: 'register', 
-    uriTemplate: '/users/register',
+    uriTemplate: '/register', 
+    controller: RegisterController::class,
     denormalizationContext: [
-        'groups' => ['user_register']
+        'groups' => ['user_write_register']
     ],
     normalizationContext: [
-        'groups' => ['user_cget']
+        'groups' => ['user_get']
     ]
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -92,10 +104,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[NotBlank()]
     #[NotNull()]
     #[Email()]
-    #[Groups(["user_cget", "user_get", "user_register", "user_resetPwd", "user_resetPwd_request"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request"])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(["user_write_register", "user_get"])]
     private array $roles = [];
 
     /**
@@ -106,7 +119,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // #[Regex("/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/i", message: "Must be minimum eight characters, at least one letter and one number ")]
     private ?string $password = null;
 
-    #[Groups(["user_changePwd", "user_register"])]
+    #[Groups(["user_changePwd", "user_write_register"])]
     private ?string $plainPassword = null;
 
     private ?string $oldPassword = null;
@@ -116,9 +129,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $resetPwdToken = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["user_get", "user_write_register"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["user_get", "user_write_register"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
@@ -291,7 +306,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isIsVerified(): ?bool
+    public function getIsVerified(): ?bool
     {
         return $this->isVerified;
     }

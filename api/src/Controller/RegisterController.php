@@ -6,30 +6,25 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsController]
 class RegisterController extends AbstractController
 {
 
-    public function __construct(private RequestStack $requestStack, private EntityManagerInterface $em){}
+    public function __construct(private RequestStack $requestStack, private EntityManagerInterface $em, private UserPasswordHasherInterface $encoder){}
 
     public function __invoke()
     {
         $name = json_decode($this->requestStack->getCurrentRequest()->getContent())->name;
         $surname = json_decode($this->requestStack->getCurrentRequest()->getContent())->surname;
         $email = json_decode($this->requestStack->getCurrentRequest()->getContent())->email;
-        $plainPassword = json_decode($this->requestStack->getCurrentRequest()->getContent())->password;
-        $confirmPassword = json_decode($this->requestStack->getCurrentRequest()->getContent())->confirmPassword;
-        $role = json_decode($this->requestStack->getCurrentRequest()->getContent())->role;
+        $plainPassword = json_decode($this->requestStack->getCurrentRequest()->getContent())->plainPassword;
+        $roles = json_decode($this->requestStack->getCurrentRequest()->getContent())->roles;
         $gravatar = "https://www.gravatar.com/avatar/".md5(strtolower(trim($email)));
-        $user->setResetPwdToken(bin2hex(random_bytes(32)));
 
         if($user = $this->em->getRepository(User::class)->findOneBy(['email' => $email])){
             throw $this->createNotFoundException('User with email already exists');
-        }
-
-        if($plainPassword !== $confirmPassword){
-            throw $this->createNotFoundException('Passwords do not match');
         }
 
         $user = (new User())
@@ -37,13 +32,17 @@ class RegisterController extends AbstractController
                  ->setSurname($surname)
                  ->setEmail($email)
                  ->setPlainPassword($plainPassword)
-                 ->setRoles([$role])
-                 ->setGravatar($gravatar)
+                 ->setRoles($roles)
+                 ->setGravatarImage($gravatar)
                  ->setVerifyEmailToken(bin2hex(random_bytes(32)));
-        
+        $user->setPassword($this->encoder->hashPassword($user, $user->getPlainPassword()));
+
+
+        $this->em->persist($user);
+        $this->em->flush();
 
         // SEND EMAIL WITH LINK AND TOKEN
 
-        return $this->json("Success");
+        return $this->json("Created", 201);
     }
 }

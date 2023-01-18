@@ -37,6 +37,6 @@ class ResetPasswordController extends AbstractController
                         'token' => $user->getResetPwdToken()]);
         $mailer->send($emailconfig);
 
-        return $this->json("Success");
+        return $this->json("Email send", 204);
     }
 }

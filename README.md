@@ -1,6 +1,7 @@
 # Install 
 
 ```
+  cp ./api/.env.example ./api/.env
   docker compose build --pull --no-cache
   docker compose up -d
 ```
@@ -15,5 +16,6 @@ wait for dependencies to install and then
     setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
     setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
   '
+  docker compose exec php php bin/console m:mig
   docker compose exec php php bin/console d:m:m
 ```
