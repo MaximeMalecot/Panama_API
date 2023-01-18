@@ -163,6 +163,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $verifyEmailToken = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $reset_pwd_token_time = null;
+
     public function __construct()
     {
         $this->createdProjects = new ArrayCollection();
@@ -492,6 +495,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setVerifyEmailToken(?string $verifyEmailToken): self
     {
         $this->verifyEmailToken = $verifyEmailToken;
+
+        return $this;
+    }
+
+    public function getResetPwdTokenTime(): ?\DateTimeInterface
+    {
+        return $this->reset_pwd_token_time;
+    }
+
+    public function setResetPwdTokenTime(?\DateTimeInterface $reset_pwd_token_time): self
+    {
+        $this->reset_pwd_token_time = $reset_pwd_token_time;
 
         return $this;
     }
