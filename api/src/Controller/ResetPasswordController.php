@@ -22,7 +22,7 @@ class ResetPasswordController extends AbstractController
         $email = json_decode($this->requestStack->getCurrentRequest()->getContent())->email;
 
         if(!$user = $this->em->getRepository(User::class)->findOneBy(['email' => $email])){
-            throw $this->createNotFoundException('User not found');
+            return $this->json("Email not found", 404);
         }
         $user->setResetPwdToken(bin2hex(random_bytes(32)));
         $this->em->flush();
