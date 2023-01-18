@@ -3,16 +3,19 @@
 namespace App\Entity;
 
 use App\Entity\Pizza;
-use Gedmo\Mapping\Annotation as Gedmo;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
+use App\Dto\UserVerifyEmailDto;
 use Doctrine\ORM\Mapping as ORM;
 use App\Dto\UserResetPasswordDto;
 use App\Repository\UserRepository;
 use ApiPlatform\Metadata\ApiResource;
+use Gedmo\Mapping\Annotation as Gedmo;
 use ApiPlatform\Metadata\GetCollection;
+use App\State\UserVerifyEmailProcessor;
+use App\Entity\Traits\TimestampableTrait;
 use App\State\UserResetPasswordProcessor;
 use App\Controller\ResetPasswordController;
 use Doctrine\Common\Collections\Collection;
@@ -25,7 +28,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use App\Entity\Traits\TimestampableTrait;
 
 #[ApiResource]
 #[Get(
@@ -57,6 +59,14 @@ use App\Entity\Traits\TimestampableTrait;
     output: User::class,
     processor: UserResetPasswordProcessor::class
 )]
+#[Patch(
+    name: 'verify_email',
+    uriTemplate: '/users/verify-email',
+    input: UserVerifyEmailDto::class,
+    output: User::class,
+    processor: UserVerifyEmailProcessor::class
+)]
+
 #[Put(
     security: "is_granted('ROLE_ADMIN') or object.getOwner() == user",
     denormalizationContext: [
