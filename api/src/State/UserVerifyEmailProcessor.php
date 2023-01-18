@@ -26,7 +26,7 @@ final class UserVerifyEmailProcessor implements ProcessorInterface
         if(!$user){
             throw new NotFoundHttpException('User not found');
         }
-        $user->setVerified(true);
+        $user->setIsVerified(true);
         $user->setVerifyEmailToken(null);
         $this->em->flush();
         return $user;
