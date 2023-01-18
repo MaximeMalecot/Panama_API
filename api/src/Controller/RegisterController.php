@@ -43,6 +43,6 @@ class RegisterController extends AbstractController
 
         // SEND EMAIL WITH LINK AND TOKEN
 
-        return $this->json("Success");
+        return $this->json("Created", 201);
     }
 }

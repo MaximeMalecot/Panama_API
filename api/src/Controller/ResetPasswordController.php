@@ -27,6 +27,6 @@ class ResetPasswordController extends AbstractController
         // SEND EMAIL WITH LINK AND TOKEN
 
 
-        return $this->json("Success");
+        return $this->json("Email send", 204);
     }
 }

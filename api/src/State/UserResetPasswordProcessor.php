@@ -26,7 +26,6 @@ final class UserResetPasswordProcessor implements ProcessorInterface
         if(!$user){
             throw new NotFoundHttpException('User not found');
         }
-        dump($operation, $context, $uriVariables);
         $user->setPassword($this->encoder->hashPassword($user, $data->password));
         $user->setResetPwdToken(null);
         $this->em->flush();
