@@ -145,6 +145,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $gravatarImage = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $verifyEmailToken = null;
+
     public function __construct()
     {
         $this->createdProjects = new ArrayCollection();
@@ -462,6 +465,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setGravatarImage(?string $gravatarImage): self
     {
         $this->gravatarImage = $gravatarImage;
+
+        return $this;
+    }
+
+    public function getVerifyEmailToken(): ?string
+    {
+        return $this->verifyEmailToken;
+    }
+
+    public function setVerifyEmailToken(?string $verifyEmailToken): self
+    {
+        $this->verifyEmailToken = $verifyEmailToken;
 
         return $this;
     }
