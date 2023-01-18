@@ -29,14 +29,14 @@ class ResetPasswordController extends AbstractController
 
         // SEND EMAIL WITH LINK AND TOKEN
         $emailconfig = (new TemplatedEmail())
-            ->from(new Address('pamana@easylocmoto.fr','Panama Agency'))
+            ->from(new Address('panama@easylocmoto.fr','Panama Agency'))
             ->to($email)
             ->subject('Reset Your Password')
-            ->htmlTemplate('template/email/Reset-password.html.twig')
+            ->htmlTemplate('mail/Reset-password.html.twig')
             ->context(['name'=> $user->getSurname(),
                         'token' => $user->getResetPwdToken()]);
         $mailer->send($emailconfig);
 
-        return $this->json("Email send", 204);
+        return $this->json("Email send", 202);
     }
 }
