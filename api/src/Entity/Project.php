@@ -44,6 +44,9 @@ class Project
     #[ORM\Column]
     private ?int $maxPrice = null;
 
+    #[ORM\Column(length: 255, options: ['default' => 'CREATED'])]
+    private ?string $status = "CREATED";
+
     public function __construct()
     {
         $this->filters = new ArrayCollection();
@@ -185,6 +188,18 @@ class Project
     public function setMaxPrice(int $maxPrice): self
     {
         $this->maxPrice = $maxPrice;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }
