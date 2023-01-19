@@ -163,6 +163,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $verifyEmailToken = null;
 
+    #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
+    private ?Subscription $subscription = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $stripeId = null;
+
     public function __construct()
     {
         $this->createdProjects = new ArrayCollection();
@@ -492,6 +498,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setVerifyEmailToken(?string $verifyEmailToken): self
     {
         $this->verifyEmailToken = $verifyEmailToken;
+
+        return $this;
+    }
+
+    public function getSubscription(): ?Subscription
+    {
+        return $this->subscription;
+    }
+
+    public function setSubscription(Subscription $subscription): self
+    {
+        // set the owning side of the relation if necessary
+        if ($subscription->getFreelancer() !== $this) {
+            $subscription->setFreelancer($this);
+        }
+
+        $this->subscription = $subscription;
+
+        return $this;
+    }
+
+    public function getStripeId(): ?string
+    {
+        return $this->stripeId;
+    }
+
+    public function setStripeId(?string $stripeId): self
+    {
+        $this->stripeId = $stripeId;
 
         return $this;
     }
