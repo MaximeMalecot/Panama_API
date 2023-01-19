@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Filter;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class FilterRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry,EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Filter::class);
     }
@@ -37,6 +38,27 @@ class FilterRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function findAllByCriteria($values)
+    {
+        $qb = $this->createQueryBuilder('f');
+        $compteur = 0;
+        foreach ($values as $value){
+            if($compteur == 0)
+            {
+                $qb->Where("f.name = :name$compteur");
+                $qb->setParameter("name$compteur",$value);
+                $compteur++;
+            }
+            else{
+                $qb->orWhere("f.name = :name$compteur");
+                $qb->setParameter("name$compteur",$value);
+                $compteur++;
+            }
+
+        }
+        return $qb->getQuery()->execute();
     }
 
 //    /**

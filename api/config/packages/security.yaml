@@ -41,6 +41,7 @@ security:
         - { path: ^/payment/create_subscription, roles: ROLE_FREELANCER}
         - { path: ^/users, roles: PUBLIC_ACCESS }
         - { path: ^/filters, roles: PUBLIC_ACCESS }
+        - { path: ^/projects, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
     role_hierarchy:
