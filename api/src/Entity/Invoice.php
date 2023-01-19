@@ -11,6 +11,12 @@ class Invoice
 {
     use TimestampableTrait;
 
+    public const STATUS = [
+        'CREATED' => 'CREATED',
+        'PAID' => 'PAID',
+        'CANCELED' => 'CANCELED',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
