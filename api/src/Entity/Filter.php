@@ -2,8 +2,11 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Controller\CategoryFiltrage;
 use App\Repository\FilterRepository;
@@ -20,6 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'groups' => ['fitler_get']
     ]
 )]
+#[ApiFilter(SearchFilter::class,properties: ['name' => 'exact','type' => 'exact'])]
 #[GetCollection(
     normalizationContext: [
         'groups' => ['fitler_cget']
