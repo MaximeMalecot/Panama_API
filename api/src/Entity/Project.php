@@ -2,18 +2,26 @@
 
 namespace App\Entity;
 
-use App\Repository\ProjectRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Gedmo\Mapping\Annotation\Slug;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ProjectRepository;
 use App\Entity\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
 {
     use TimestampableTrait;
     
+    public const STATUS = [
+        'CREATED' => 'CREATED',
+        'ACTIVE' => 'ACTIVE',
+        'CANCELED' => 'CANCELED',
+        'IN_PROGRESS' => 'IN_PROGRESS',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
@@ -46,6 +54,10 @@ class Project
 
     #[ORM\Column(length: 255, options: ['default' => 'CREATED'])]
     private ?string $status = "CREATED";
+
+    #[ORM\Column(length: 128, unique: true)]
+    #[Slug(fields: ['id', 'name'])]
+    private $slug;
 
     public function __construct()
     {
@@ -202,5 +214,10 @@ class Project
         $this->status = $status;
 
         return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
     }
 }
