@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
 #[Get(
-    security: "is_granted('ROLE_FREELANCER_PREMIUM')",
+    security: "is_granted('ROLE_FREELANCER')",
     normalizationContext: [
         'groups' => ['project_get']
     ]
