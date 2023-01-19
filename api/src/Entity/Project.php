@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\Get;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation\Slug;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProjectRepository;
 use ApiPlatform\Metadata\GetCollection;
@@ -22,7 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 #[Get(
     name: 'get_project_by_owner',
-    path: '/projects/owner',
+    uriTemplate: '/projects/owner',
     security: "object.getOwner() === user",
     normalizationContext: [
         'groups' => ['project_get_own']
@@ -39,6 +40,13 @@ class Project
 {
     use TimestampableTrait;
     
+    public const STATUS = [
+        'CREATED' => 'CREATED',
+        'ACTIVE' => 'ACTIVE',
+        'CANCELED' => 'CANCELED',
+        'IN_PROGRESS' => 'IN_PROGRESS',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
@@ -84,6 +92,10 @@ class Project
     #[ORM\Column]
     #[Groups(["project_get", "project_get_own"])]
     private ?int $length = null;
+    
+    #[ORM\Column(length: 128, unique: true)]
+    #[Slug(fields: ['id', 'name'])]
+    private $slug;
 
     public function __construct()
     {
@@ -252,5 +264,10 @@ class Project
         $this->length = $length;
 
         return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
     }
 }

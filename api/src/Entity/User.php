@@ -163,6 +163,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $verifyEmailToken = null;
 
+    #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
+    private ?Subscription $subscription = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $stripeId = null;
+    
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $reset_pwd_token_time = null;
 
@@ -498,7 +504,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    
+    public function getSubscription(): ?Subscription
+    {
+        return $this->subscription;
+    }
 
+    public function setSubscription(Subscription $subscription): self
+    {
+        // set the owning side of the relation if necessary
+        if ($subscription->getFreelancer() !== $this) {
+            $subscription->setFreelancer($this);
+        }
+
+        $this->subscription = $subscription;
+
+        return $this;
+    }
+
+    public function getStripeId(): ?string
+    {
+        return $this->stripeId;
+    }
+
+    public function setStripeId(?string $stripeId): self
+    {
+        $this->stripeId = $stripeId;
+        return $this;
+    }
+    
     public function getResetPwdTokenTime(): ?\DateTimeInterface
     {
         return $this->reset_pwd_token_time;
@@ -507,7 +541,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setResetPwdTokenTime(?\DateTimeInterface $reset_pwd_token_time): self
     {
         $this->reset_pwd_token_time = $reset_pwd_token_time;
-
         return $this;
     }
 }
