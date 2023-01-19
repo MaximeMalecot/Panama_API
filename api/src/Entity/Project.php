@@ -6,15 +6,18 @@ use ApiPlatform\Metadata\Get;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\Slug;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProjectRepository;
 use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'exact', 'status' => 'exact', 'filters.name' => 'exact' ])]
 #[Get(
     security: "is_granted('ROLE_FREELANCER')",
     normalizationContext: [
@@ -30,7 +33,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[GetCollection(
-    security: "is_granted('ROLE_FREELANCER')",
+    security: "is_granted('ROLE_FREELANCER') or is_granted('ROLE_CLIENT')",
     normalizationContext: [
         'groups' => ['project_cget']
     ]
