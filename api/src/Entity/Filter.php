@@ -2,12 +2,22 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use App\Controller\CategoryFiltrage;
 use App\Repository\FilterRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\TimestampableTrait;
-
+#[ApiResource]
+#[Post(
+    name: 'filtrage',
+    uriTemplate: '/filtre/category',
+    controller: CategoryFiltrage::class
+)]
+#[Post]
 #[ORM\Entity(repositoryClass: FilterRepository::class)]
 class Filter
 {
