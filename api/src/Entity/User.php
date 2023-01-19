@@ -168,6 +168,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $stripeId = null;
+    
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $reset_pwd_token_time = null;
 
     public function __construct()
     {
@@ -501,7 +504,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
+    
     public function getSubscription(): ?Subscription
     {
         return $this->subscription;
@@ -527,7 +530,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setStripeId(?string $stripeId): self
     {
         $this->stripeId = $stripeId;
+        return $this;
+    }
+    
+    public function getResetPwdTokenTime(): ?\DateTimeInterface
+    {
+        return $this->reset_pwd_token_time;
+    }
 
+    public function setResetPwdTokenTime(?\DateTimeInterface $reset_pwd_token_time): self
+    {
+        $this->reset_pwd_token_time = $reset_pwd_token_time;
         return $this;
     }
 }

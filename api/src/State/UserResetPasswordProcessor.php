@@ -26,9 +26,18 @@ final class UserResetPasswordProcessor implements ProcessorInterface
         if(!$user){
             throw new NotFoundHttpException('User not found');
         }
-        $user->setPassword($this->encoder->hashPassword($user, $data->password));
-        $user->setResetPwdToken(null);
-        $this->em->flush();
-        return $user;
+        $now = new \DateTime();
+        if ( $now->format("U")-$user->getResetPwdTokenTime()->format("U")<3600 )
+        {
+            $user->setPassword($this->encoder->hashPassword($user, $data->password));
+            $user->setResetPwdToken(null);
+            $this->em->flush();
+            return $user;
+        }
+        else{
+            return json("Token Expired" , 403);
+        }
     }
+
+
 }
