@@ -11,6 +11,12 @@ class Invoice
 {
     use TimestampableTrait;
 
+    public const STATUS = [
+        'CREATED' => 'CREATED',
+        'PAID' => 'PAID',
+        'CANCELED' => 'CANCELED',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
@@ -26,7 +32,6 @@ class Invoice
     private ?string $status = null;
 
     #[ORM\OneToOne(inversedBy: 'invoice', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
     private ?Project $project = null;
 
     #[ORM\ManyToOne(inversedBy: 'invoices')]
@@ -94,6 +99,18 @@ class Invoice
     public function setClient(?User $client): self
     {
         $this->client = $client;
+
+        return $this;
+    }
+
+    public function getSubscription(): ?Subscription
+    {
+        return $this->subscription;
+    }
+
+    public function setSubscription(?Subscription $subscription): self
+    {
+        $this->subscription = $subscription;
 
         return $this;
     }

@@ -10,14 +10,21 @@ use App\Repository\FilterRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 #[ApiResource]
-#[Post(
-    name: 'filtrage',
-    uriTemplate: '/filtre/category',
-    controller: CategoryFiltrage::class
+#[Get(
+    normalizationContext: [
+        'groups' => ['fitler_get']
+    ]
 )]
-#[Post]
+#[GetCollection(
+    normalizationContext: [
+        'groups' => ['fitler_cget']
+    ]
+)]
 #[ORM\Entity(repositoryClass: FilterRepository::class)]
 class Filter
 {
@@ -26,15 +33,19 @@ class Filter
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(["fitler_get", "fitler_cget"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["fitler_get", "fitler_cget"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["fitler_get", "fitler_cget"])]
     private ?string $type = null;
 
     #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'filters')]
+    #[Groups(["fitler_get"])]
     private Collection $projects;
 
     public function __construct()

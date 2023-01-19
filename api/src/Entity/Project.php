@@ -2,27 +2,63 @@
 
 namespace App\Entity;
 
-use App\Repository\ProjectRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Metadata\Get;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation\Slug;
+use ApiPlatform\Metadata\ApiResource;
+use App\Repository\ProjectRepository;
+use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource]
+#[Get(
+    security: "is_granted('ROLE_FREELANCER')",
+    normalizationContext: [
+        'groups' => ['project_get']
+    ]
+)]
+#[Get(
+    name: 'get_project_by_owner',
+    uriTemplate: '/projects/owner',
+    security: "object.getOwner() === user",
+    normalizationContext: [
+        'groups' => ['project_get_own']
+    ]
+)]
+#[GetCollection(
+    security: "is_granted('ROLE_FREELANCER')",
+    normalizationContext: [
+        'groups' => ['project_cget']
+    ]
+)]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
 {
     use TimestampableTrait;
     
+    public const STATUS = [
+        'CREATED' => 'CREATED',
+        'ACTIVE' => 'ACTIVE',
+        'CANCELED' => 'CANCELED',
+        'IN_PROGRESS' => 'IN_PROGRESS',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(["project_get", "project_cget", "project_get_own"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["project_get", "project_cget", "project_get_own"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(["project_get", "project_get_own"])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'createdProjects')]
@@ -30,22 +66,36 @@ class Project
     private ?User $owner = null;
 
     #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects')]
+    #[Groups(["project_get", "project_cget", "project_get_own"])]
     private Collection $filters;
 
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: Proposition::class)]
+    #[Groups(["project_get_own"])]
     private Collection $propositions;
 
     #[ORM\OneToOne(mappedBy: 'project', cascade: ['persist', 'remove'])]
+    #[Groups(["project_get_own"])]
     private ?Invoice $invoice = null;
 
     #[ORM\Column]
+    #[Groups(["project_get", "project_get_own"])]
     private ?int $minPrice = null;
 
     #[ORM\Column]
+    #[Groups(["project_get", "project_get_own"])]
     private ?int $maxPrice = null;
 
     #[ORM\Column(length: 255, options: ['default' => 'CREATED'])]
+    #[Groups(["project_get_own"])]
     private ?string $status = "CREATED";
+
+    #[ORM\Column]
+    #[Groups(["project_get", "project_get_own"])]
+    private ?int $length = null;
+    
+    #[ORM\Column(length: 128, unique: true)]
+    #[Slug(fields: ['id', 'name'])]
+    private $slug;
 
     public function __construct()
     {
@@ -202,5 +252,22 @@ class Project
         $this->status = $status;
 
         return $this;
+    }
+
+    public function getLength(): ?int
+    {
+        return $this->length;
+    }
+
+    public function setLength(int $length): self
+    {
+        $this->length = $length;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
     }
 }
