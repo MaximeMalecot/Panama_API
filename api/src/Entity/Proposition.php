@@ -24,7 +24,7 @@ class Proposition
 
     #[ORM\ManyToOne(inversedBy: 'propositions')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $client = null;
+    private ?User $freelancer = null;
 
     public function getId(): ?int
     {
@@ -55,14 +55,14 @@ class Proposition
         return $this;
     }
 
-    public function getClient(): ?User
+    public function getFreelancer(): ?User
     {
-        return $this->client;
+        return $this->freelancer;
     }
 
-    public function setClient(?User $client): self
+    public function setFreelancer(?User $freelancer): self
     {
-        $this->client = $client;
+        $this->freelancer = $freelancer;
 
         return $this;
     }

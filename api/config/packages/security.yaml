@@ -30,25 +30,25 @@ security:
             jwt: ~
 
     access_control:
-        - { path: ^/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/authentication_token, roles: PUBLIC_ACCESS }
-        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
+        - { path: ^/payment/create_checkout, roles: ROLE_CLIENT}
+        - { path: ^/payment/create_subscription, roles: ROLE_FREELANCER}
         - { path: ^/users/verify_email, roles: PUBLIC_ACCESS }
         - { path: ^/users/update_password, roles: PUBLIC_ACCESS }
         - { path: ^/users/forgot_password, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/webhook, roles: PUBLIC_ACCESS }
-        - { path: ^/payment/create_checkout, roles: ROLE_CLIENT}
-        - { path: ^/payment/create_subscription, roles: ROLE_FREELANCER}
-        - { path: ^/users, roles: PUBLIC_ACCESS }
-        - { path: ^/filters, roles: PUBLIC_ACCESS }
-        - { path: ^/projects, roles: PUBLIC_ACCESS }
+        # - { path: ^/users, roles: PUBLIC_ACCESS }
+        # - { path: ^/filters, roles: PUBLIC_ACCESS }
+        # - { path: ^/projects, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
     role_hierarchy:
         ROLE_CLIENT: ROLE_USER
         ROLE_FREELANCER: ROLE_USER
         ROLE_FREELANCER_PREMIUM: ROLE_FREELANCER
-        ROLE_ADMIN: ROLE_USER
+        ROLE_ADMIN: ROLE_FREELANCER
 
 when@test:
     security:

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Stripe\Webhook;
+use App\Entity\User;
 use App\Entity\Invoice;
 use App\Entity\Project;
 use Stripe\StripeClient;
@@ -77,5 +78,31 @@ class WebhookController extends AbstractController
             return $this->json($e->getMessage(), 500);
         }
     }
+
+    #[Route('/kyc_verification/{id}', name: 'kyc_verification', methods: ['POST'])]
+    public function kycVerification(Request $request, EntityManagerInterface $em, UserRepository $userRepository){
+        $validStatus = ['success', 'failed'];
+        $userId = $request->get("id");
+        $status = $request->query->get("status");
+        $user = $userRepository->findOneBy(['id' => $userId]);
+        $receivedApiSecret = $request->headers->get('authorization');
+
+        try{
+            if(!$receivedApiSecret)                                                         throw new \Exception("Missing secret");
+            if($receivedApiSecret !== $_ENV['KYC_API_SECRET'])                              throw new \Exception("Invalid secret");
+            if(!$user)                                                                      throw new \Exception("User not found");
+            if (!in_array("ROLE_FREELANCER", $user->getRoles()))                            throw new \Exception("Invalid role");
+            if ($user->getFreelancerInfo() && $user->getFreelancerInfo()->getIsVerified() ) throw new \Exception("Already verified");
+            if(!in_array($status, $validStatus))                                            throw new \Exception("Invalid status");
+        }catch(\Exception $e){
+            return $this->json($e->getMessage(), 400);
+        }
+
+        if($status === 'failed') return $this->json(200);
+        $user->getFreelancerInfo()->setIsVerified(true);
+        $em->flush();
+        return $this->json(200);
+    }
+
 }
 ?>

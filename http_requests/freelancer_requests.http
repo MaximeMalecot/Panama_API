@@ -1,0 +1,26 @@
+## LOGIN AS CLIENT
+# @name login_freelancer
+POST https://localhost:443/authentication_token
+content-type: application/json
+
+{
+    "email": "freelance@freelance.com",
+    "password": "test"
+}
+
+@freelancer_token = {{login_freelancer.response.body.token}}
+
+# Create a project 
+POST https://localhost:443/payment/create_checkout
+content-type: application/json
+Authorization: Bearer {{client_token}}
+
+{
+    "name": "test",
+    "description": "lorem",
+    "minPrice": 10,
+    "maxPrice": 100,
+    "filters": [],
+    "length: 10
+}
+
