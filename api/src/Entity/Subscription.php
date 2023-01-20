@@ -2,13 +2,30 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Metadata\Get;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
 use App\Repository\SubscriptionRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource]
+#[Get(
+    security: "is_granted('ROLE_ADMIN') or object.getFreelancer() == user",
+    normalizationContext: [
+        'groups' => ['subscription_get']
+    ]
+)]
+#[GetCollection(
+    security: "is_granted('ROLE_ADMIN')",
+    normalizationContext: [
+        'groups' => ['subscription_cget']
+    ]
+)]
 #[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
 class Subscription
 {
@@ -20,17 +37,21 @@ class Subscription
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["subscription_get", "subscription_cget"])]
     private ?string $stripeId = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    #[Groups(["subscription_get", "subscription_cget"])]
     private ?bool $isActive = false;
 
     #[ORM\OneToOne(inversedBy: 'subscription', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["subscription_plan_get", "subscription_get", "subscription_cget"])]
     private ?User $freelancer = null;
 
     #[ORM\ManyToOne(inversedBy: 'subscriptions')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["subscription_get", "subscription_cget"])]
     private ?SubscriptionPlan $plan = null;
 
     public function __construct()

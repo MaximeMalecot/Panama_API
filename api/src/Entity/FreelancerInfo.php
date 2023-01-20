@@ -2,15 +2,30 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Dto\FreelancerInfoKYCDto;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use App\State\FreelancerInfoKYCProcessor;
 use App\Repository\FreelancerInfoRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
+#[Get(
+    security: "is_granted('ROLE_ADMIN') or object.getFreelancer() == user",
+    normalizationContext: [
+        'groups' => ['freelancer_info_get']
+    ]
+)]
+#[GetCollection(
+    security: "is_granted('ROLE_ADMIN')",
+    normalizationContext: [
+        'groups' => ['freelancer_info_cget']
+    ]
+)]
 #[Post(
     security: "is_granted('FREELANCER_VERIFY')",
     name: 'freelancer_info_kyc',
@@ -25,25 +40,32 @@ class FreelancerInfo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget", "specific_freelancer_get"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget"])]
     private ?bool $isVerified = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get"])]
     private ?string $description = null;
 
     #[ORM\Column(length: 12, nullable: true)]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get"])]
     private ?string $phoneNb = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get"])]
     private ?string $address = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get"])]
     private ?string $city = null;
 
     #[ORM\OneToOne(inversedBy: 'freelancerInfo', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget"])]
     private ?User $freelancer = null;
 
     public function getId(): ?int
