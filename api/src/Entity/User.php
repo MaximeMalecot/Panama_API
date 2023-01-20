@@ -44,6 +44,14 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         'groups' => ['user_get', 'specific_client_get']
     ]
 )]
+#[Get(
+    security: 'is_granted("GET_FREELANCER", object)',
+    name: 'specific_freelancer',
+    uriTemplate: '/users/freelancer/{id}',
+    normalizationContext: [
+        'groups' => ['user_get', 'specific_freelancer_get']
+    ]
+)]
 #[GetCollection(
     normalizationContext: [
         'groups' => ['user_cget']
@@ -106,13 +114,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
     #[NotBlank()]
     #[NotNull()]
     #[Email()]
-    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get"])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -136,11 +145,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $resetPwdToken = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_write_register"])]
+    #[Groups(["user_get", "user_write_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_write_register"])]
+    #[Groups(["user_get", "user_write_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
@@ -151,6 +160,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?ClientInfo $clientInfo = null;
 
     #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
+    #[Groups(["user_get", "specific_freelancer_get"])]
     private ?FreelancerInfo $freelancerInfo = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Project::class, orphanRemoval: true)]

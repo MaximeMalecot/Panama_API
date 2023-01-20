@@ -15,12 +15,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 class UserVoter extends Voter
 {
     public const GET_CLIENT = 'GET_CLIENT';
+    public const GET_FREELANCER = 'GET_FREELANCER';
 
     public function __construct(private RequestStack $requestStack, private EntityManagerInterface $em, private ProjectRepository $projectRepository){}
 
     protected function supports(string $attribute, $subject): bool
     {
-        return in_array($attribute, [self::GET_CLIENT])
+        return in_array($attribute, [self::GET_CLIENT, self::GET_FREELANCER])
             && $subject instanceof \App\Entity\User;
     }
 
@@ -37,6 +38,9 @@ class UserVoter extends Voter
         switch ($attribute) {
             case self::GET_CLIENT:
                 return $this->hasAccess($user, $subject);
+                break;
+            case self::GET_FREELANCER:
+                return $this->hasAccess($subject, $user);
                 break;
         }
 

@@ -2,13 +2,30 @@
 
 namespace App\Entity;
 
-use App\Repository\SubscriptionPlanRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Metadata\Get;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\Collection;
+use App\Repository\SubscriptionPlanRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource]
+#[Get(
+    security: "is_granted('ROLE_ADMIN')",
+    normalizationContext: [
+        'groups' => ['subscription_plan_get']
+    ]
+)]
+#[GetCollection(
+    security: "is_granted('ROLE_FREELANCER') or is_granted('ROLE_ADMIN')",
+    normalizationContext: [
+        'groups' => ['subscription_plan_cget']
+    ]
+)]
 #[ORM\Entity(repositoryClass: SubscriptionPlanRepository::class)]
 class SubscriptionPlan
 {
@@ -17,24 +34,31 @@ class SubscriptionPlan
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(["subscription_plan_get", "subscription_plan_cget", "subscription_get", "subscription_cget"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["subscription_plan_get", "subscription_plan_cget", "subscription_get", "subscription_cget"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(["subscription_plan_get", "subscription_plan_cget"])]
     private ?string $description = null;
 
     #[ORM\Column(length: 7)]
+    #[Groups(["subscription_plan_get", "subscription_plan_cget"])]
     private ?string $color = null;
 
     #[ORM\Column]
+    #[Groups(["subscription_plan_get", "subscription_plan_cget", "subscription_get", "subscription_cget"])]
     private ?float $price = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["subscription_plan_get", "subscription_get"])]
     private ?string $stripeId = null;
 
     #[ORM\OneToMany(mappedBy: 'plan', targetEntity: Subscription::class, orphanRemoval: true)]
+    #[Groups(["subscription_plan_get"])]
     private Collection $subscriptions;
 
     public function __construct()
