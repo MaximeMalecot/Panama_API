@@ -37,26 +37,26 @@ class UserVoter extends Voter
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case self::GET_CLIENT:
-                return $this->hasAccess($user, $subject);
+                return $this->canGetInfo($user, $subject);
                 break;
             case self::GET_FREELANCER:
-                return $this->hasAccess($subject, $user);
+                return $this->canGetInfo($subject, $user);
                 break;
         }
 
         return false;
     }
 
-
-    private function hasAccess(User $user, User $subject){
-        if( in_array("ROLE_ADMIN", $user->getRoles()) ) return true;
-        if( $subject->getId() === $user->getId() )      return true;
+    private function canGetInfo(User $freelancer, User $client){
+        if( in_array("ROLE_ADMIN", $freelancer->getRoles()) ) return true;
+        //if( $client->getId() === $freelancer->getId() )      return true;
         
-        if( in_array('ROLE_CLIENT', $subject->getRoles()) 
-            && in_array('ROLE_FREELANCER_PREMIUM', $user->getRoles()) 
+        if( in_array('ROLE_CLIENT', $client->getRoles()) 
+            && in_array('ROLE_FREELANCER_PREMIUM', $freelancer->getRoles()) 
         ){
-            return $this->projectRepository->hasCommonProject($subject, $user );
+            return $this->projectRepository->hasCommonProject($client, $freelancer );
         }
         return false;
     }
+
 }
