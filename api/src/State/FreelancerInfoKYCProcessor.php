@@ -21,7 +21,7 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
         }
 
         $user = $this->security->getUser();
-        if (!$user) {
+        if ( $user->getFreelancerInfo()->getIsVerified() ) {
             return null;
         }
 
@@ -32,7 +32,7 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
             "error_uri" => $baseUrl."/webhook/kyc_verification/{$user->getId()}?status=failed",
         );
 
-        $content = array("ciret" => $data->ciret, "name" => $user->getName(), "surname" => $user->getSurname());
+        $content = array("siret" => $data->siret, "name" => $user->getName(), "surname" => $user->getSurname());
         $body = array("uri" => $uri, "data" => $content);
         $body_string = json_encode($body);
         

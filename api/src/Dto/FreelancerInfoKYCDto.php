@@ -12,6 +12,6 @@ final class FreelancerInfoKYCDto
 {
     #[Assert\NotBlank]
     #[Assert\Length(min: 9, max: 9)]
-    public $ciret;
+    public $siret;
 
 }

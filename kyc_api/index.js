@@ -11,14 +11,15 @@ app.post("/success", (req, res) => {
 
 app.post("/check", async (req, res) => {
     try {
+        console.log(req.body)
         if (!req.body) throw new Error("Missing body");
         if (!req.body.data) throw new Error("Missing data");
         if (!req.body.uri) throw new Error("Missing uri ");
 
-        const { ciret, name, surname } = req.body.data;
+        const { siret, name, surname } = req.body.data;
         const { success_uri, error_uri } = req.body.uri;
 
-        if (!ciret || !name || !surname)
+        if (!siret || !name || !surname)
             throw new Error("Missing data field(s)");
         if (!success_uri || !error_uri)
             throw new Error("Missing one or both uri");

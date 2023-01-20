@@ -3,7 +3,7 @@ content-type: application/json
 
 {
     "data":{
-        "ciret": "123456789",
+        "siret": "123456789",
         "name": "Doe",
         "surname": "John"
     },

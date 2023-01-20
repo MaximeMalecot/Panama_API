@@ -12,7 +12,7 @@ use App\Repository\FreelancerInfoRepository;
 
 #[ApiResource]
 #[Post(
-    security: "is_granted('ROLE_FREELANCER')",
+    security: "is_granted('FREELANCER_VERIFY')",
     name: 'freelancer_info_kyc',
     uriTemplate: '/freelancer_info/kyc', 
     input: FreelancerInfoKYCDto::class, 
