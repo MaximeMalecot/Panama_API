@@ -2,10 +2,23 @@
 
 namespace App\Entity;
 
-use App\Repository\FreelancerInfoRepository;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Dto\FreelancerInfoKYCDto;
+use ApiPlatform\Metadata\ApiResource;
+use App\State\FreelancerInfoKYCProcessor;
+use App\Repository\FreelancerInfoRepository;
 
+#[ApiResource]
+#[Post(
+    security: "is_granted('ROLE_FREELANCER')",
+    name: 'freelancer_info_kyc',
+    uriTemplate: '/freelancer_info/kyc', 
+    input: FreelancerInfoKYCDto::class, 
+    processor: FreelancerInfoKYCProcessor::class,
+    status: 204
+)]
 #[ORM\Entity(repositoryClass: FreelancerInfoRepository::class)]
 class FreelancerInfo
 {
