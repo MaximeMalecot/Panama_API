@@ -48,7 +48,7 @@ security:
         ROLE_CLIENT: ROLE_USER
         ROLE_FREELANCER: ROLE_USER
         ROLE_FREELANCER_PREMIUM: ROLE_FREELANCER
-        ROLE_ADMIN: ROLE_USER
+        ROLE_ADMIN: ROLE_FREELANCER
 
 when@test:
     security:
