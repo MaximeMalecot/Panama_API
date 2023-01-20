@@ -156,7 +156,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Project::class, orphanRemoval: true)]
     private Collection $createdProjects;
 
-    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Proposition::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'freelancer', targetEntity: Proposition::class, orphanRemoval: true)]
     private Collection $propositions;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Invoice::class, orphanRemoval: true)]

@@ -68,7 +68,7 @@ class ProjectRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder("p");
         $v = $qb->where("p.owner = :cId")
             ->innerJoin("p.propositions", "pr")
-            ->andWhere("pr.client = :fId" ) //Todo change client to freelancer
+            ->andWhere("pr.freelancer = :fId" )
             ->andWhere("pr.status = 'ACCEPTED'")
             ->setParameters([ 
                 "cId" => $client->getId(),

@@ -36,15 +36,15 @@ class ClientInfo
     #[Groups(["clientInfo_get", "specific_client_get"])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["clientInfo_get", "clientInfo_patch", "specific_client_get"])]
     private ?string $address = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["clientInfo_get", "clientInfo_patch", "specific_client_get"])]
     private ?string $city = null;
 
-    #[ORM\Column(length: 12)]
+    #[ORM\Column(length: 12, nullable: true)]
     #[Groups(["clientInfo_get", "clientInfo_patch", "specific_client_get"])]
     private ?string $phoneNb = null;
 
