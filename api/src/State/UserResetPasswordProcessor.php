@@ -35,7 +35,7 @@ final class UserResetPasswordProcessor implements ProcessorInterface
             return $user;
         }
         else{
-            return json("Token Expired" , 403);
+            return null;
         }
     }
 
