@@ -57,6 +57,7 @@ class WebhookController extends AbstractController
                     if($subscription->getIsActive()) { 
                         return $this->json('Already active', 200);
                     }
+                    $user->setRoles(['ROLE_FREELANCER_PREMIUM']);
                     $subscription->setIsActive(true);
                     $em->flush();
                     return $this->json('Subscription activated', 204);
@@ -69,6 +70,7 @@ class WebhookController extends AbstractController
                         return $this->json('Already canceled', 200);
                     }
                     $subscription->setIsActive(false);
+                    $user->setRoles(['ROLE_FREELANCER']);
                     $em->flush();
                     return $this->json('Subscription canceled', 204);
                 default:
