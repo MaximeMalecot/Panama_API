@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
@@ -11,6 +10,8 @@ use App\Repository\ReviewRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource]
 #[Get(
@@ -43,7 +44,7 @@ class Review
     #[Groups(["review_get", "review_cget"])]
     private ?int $id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Assert\Range(
         min: 0,
         max: 10,
@@ -56,12 +57,9 @@ class Review
     #[Groups(["review_get", "review_post"])]
     private ?string $content = null;
 
-    #[ORM\OneToOne(inversedBy: 'review', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Project $project = null;
-
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["review_post"])]
     private ?FreelancerInfo $freelancer = null;
 
     public function getId(): ?int
@@ -89,18 +87,6 @@ class Review
     public function setContent(string $content): self
     {
         $this->content = $content;
-
-        return $this;
-    }
-
-    public function getProject(): ?Project
-    {
-        return $this->project;
-    }
-
-    public function setProject(Project $project): self
-    {
-        $this->project = $project;
 
         return $this;
     }
