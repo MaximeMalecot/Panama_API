@@ -79,13 +79,17 @@ class WebhookController extends AbstractController
         }
     }
 
-    #[Route('/kyc_verification/{id}', name: 'kyc_verification')]
+    #[Route('/kyc_verification/{id}', name: 'kyc_verification', methods: ['POST'])]
     public function kycVerification(Request $request, EntityManagerInterface $em, UserRepository $userRepository){
         $validStatus = ['success', 'failed'];
         $userId = $request->get("id");
         $status = $request->query->get("status");
         $user = $userRepository->findOneBy(['id' => $userId]);
+        $receivedApiSecret = $request->headers->get('authorization');
+
         try{
+            if(!$receivedApiSecret)                                                         throw new \Exception("Missing secret");
+            if($receivedApiSecret !== $_ENV['KYC_API_SECRET'])                              throw new \Exception("Invalid secret");
             if(!$user)                                                                      throw new \Exception("User not found");
             if (!in_array("ROLE_FREELANCER", $user->getRoles()))                            throw new \Exception("Invalid role");
             if ($user->getFreelancerInfo() && $user->getFreelancerInfo()->getIsVerified() ) throw new \Exception("Already verified");
