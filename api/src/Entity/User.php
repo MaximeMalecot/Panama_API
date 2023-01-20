@@ -36,6 +36,13 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         'groups' => ['user_get']
     ]
 )]
+#[Get(
+    name: 'specific_client',
+    uriTemplate: '/users/clients/{id}',
+    normalizationContext: [
+        'groups' => ['user_get', 'specific_client_get']
+    ]
+)]
 #[GetCollection(
     normalizationContext: [
         'groups' => ['user_cget']
@@ -108,14 +115,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(["user_write_register", "user_get"])]
+    #[Groups(["user_write_register"])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Groups(["user_get"])]
     // #[Regex("/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/i", message: "Must be minimum eight characters, at least one letter and one number ")]
     private ?string $password = null;
 
@@ -140,6 +146,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $isVerified = false;
 
     #[ORM\OneToOne(mappedBy: 'client', cascade: ['persist', 'remove'])]
+    #[Groups(["user_get", "specific_client_get"])]
     private ?ClientInfo $clientInfo = null;
 
     #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
