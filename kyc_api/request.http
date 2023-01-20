@@ -1,0 +1,14 @@
+POST http://localhost:3000/check
+content-type: application/json
+
+{
+    "data":{
+        "ciret": "123456789",
+        "name": "Doe",
+        "surname": "John"
+    },
+    "uri":{
+        "success_uri": "http://localhost:3000/success",
+        "error_uri": "http://localhost:3000/failure"
+    }
+}

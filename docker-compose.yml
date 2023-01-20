@@ -22,6 +22,17 @@ services:
       MERCURE_URL: ${CADDY_MERCURE_URL:-http://caddy/.well-known/mercure}
       MERCURE_PUBLIC_URL: https://${SERVER_NAME:-localhost}/.well-known/mercure
       MERCURE_JWT_SECRET: ${CADDY_MERCURE_JWT_SECRET:-!ChangeMe!}
+    
+  kyc:
+    build: ./kyc_api
+    volumes:
+      - ./kyc_api:/usr/local/server
+      - /usr/local/server/node_modules
+    working_dir: /usr/local/server
+    environment:
+      - PORT=3000
+    ports:
+      - 3000:3000
 
   caddy:
     build:
