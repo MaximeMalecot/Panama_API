@@ -100,9 +100,6 @@ class Project
     #[Slug(fields: ['id', 'name'])]
     private $slug;
 
-    #[ORM\OneToOne(mappedBy: 'project', cascade: ['persist', 'remove'])]
-    private ?Review $review = null;
-
     public function __construct()
     {
         $this->filters = new ArrayCollection();
@@ -275,22 +272,5 @@ class Project
     public function getSlug(): ?string
     {
         return $this->slug;
-    }
-
-    public function getReview(): ?Review
-    {
-        return $this->review;
-    }
-
-    public function setReview(Review $review): self
-    {
-        // set the owning side of the relation if necessary
-        if ($review->getProject() !== $this) {
-            $review->setProject($this);
-        }
-
-        $this->review = $review;
-
-        return $this;
     }
 }
