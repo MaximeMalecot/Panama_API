@@ -14,19 +14,19 @@ class FreelancerInfo
     #[ORM\Column()]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?bool $isVerified = null;
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    private ?bool $isVerified = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 12)]
+    #[ORM\Column(length: 12, nullable: true)]
     private ?string $phoneNb = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $address = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $city = null;
 
     #[ORM\OneToOne(inversedBy: 'freelancerInfo', cascade: ['persist', 'remove'])]
@@ -38,7 +38,7 @@ class FreelancerInfo
         return $this->id;
     }
 
-    public function isIsVerified(): ?bool
+    public function getIsVerified(): ?bool
     {
         return $this->isVerified;
     }

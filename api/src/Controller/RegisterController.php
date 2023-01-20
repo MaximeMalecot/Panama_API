@@ -2,6 +2,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\ClientInfo;
+use App\Entity\FreelancerInfo;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -37,6 +39,15 @@ class RegisterController extends AbstractController
                  ->setVerifyEmailToken(bin2hex(random_bytes(32)));
         $user->setPassword($this->encoder->hashPassword($user, $user->getPlainPassword()));
 
+        if( in_array("ROLE_CLIENT", $roles) ){
+            $profile = (new ClientInfo())->setClient($user);
+            $this->em->persist($profile);
+        }
+
+        if( in_array("ROLE_FREELANCER", $roles) ){
+            $profile = (new FreelancerInfo())->setFreelancer($user);
+            $this->em->persist($profile);
+        }
 
         $this->em->persist($user);
         $this->em->flush();
