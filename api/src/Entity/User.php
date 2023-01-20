@@ -37,6 +37,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     ]
 )]
 #[Get(
+    security: 'is_granted("GET_CLIENT", object)',
     name: 'specific_client',
     uriTemplate: '/users/clients/{id}',
     normalizationContext: [

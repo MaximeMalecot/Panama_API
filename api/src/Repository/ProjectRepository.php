@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\Project;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Project>
@@ -63,4 +64,21 @@ class ProjectRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function hasCommonProject(User $client, User $freelancer){
+        $qb = $this->createQueryBuilder("p");
+        $v = $qb->where("p.owner = :cId")
+            ->innerJoin("p.propositions", "pr")
+            ->andWhere("pr.client = :fId" ) //Todo change client to freelancer
+            ->andWhere("pr.status = 'ACCEPTED'")
+            ->setParameters([ 
+                "cId" => $client->getId(),
+                "fId" => $freelancer->getId()
+            ])
+            ->getQuery()
+            ->getResult();
+        if(count($v) > 0){
+            return true;
+        }
+        return false;
+    }
 }

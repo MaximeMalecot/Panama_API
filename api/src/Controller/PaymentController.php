@@ -38,7 +38,8 @@ class PaymentController extends AbstractController
             ]);
             $user->setStripeId($customer->id);
         }
-        if(!isset($body['name']) || !isset($body['description']) || !isset($body['minPrice']) || !isset($body['maxPrice']) || !isset($body['length']) || !isset($body['filters'])){
+        
+        if(!isset($body['name']) || !isset($body['description']) || !isset($body['minPrice']) || !isset($body['maxPrice']) || !isset($body['length'])){
             return $this->json(['error' => 'Missing parameters'], 400);
         }
 
@@ -51,12 +52,15 @@ class PaymentController extends AbstractController
                     ->setLength($body['length'])
                     ;
 
-        foreach($body['filters'] as $filter){
-            $entityFilter = $filterRepository->find($filter);
-            if($entityFilter){
-                $project->addFilter($entityFilter);
+        if( isset($body['filters']) && is_array($body['filters']) && count($body['filters']) > 0 ){
+            foreach($body['filters'] as $filter){
+                $entityFilter = $filterRepository->find($filter);
+                if($entityFilter){
+                    $project->addFilter($entityFilter);
+                }
             }
         }
+
         $em->persist($project);
         $em->flush();
 
@@ -93,6 +97,8 @@ class PaymentController extends AbstractController
         if(!$session->url){
             return $this->json(['error' => 'error'], 500);
         }
+
+        dump($session->url);
         return $this->json([
             'url' => $session->url
         ], 200);

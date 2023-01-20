@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
 #[Get(
-    //security: "is_granted('GET_CLIENT_INFO')",
+    security: "is_granted('ROLE_ADMIN')",
     normalizationContext: [
         'groups' => ["clientInfo_get"]
     ],
