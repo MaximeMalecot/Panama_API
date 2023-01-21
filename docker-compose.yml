@@ -3,7 +3,8 @@ version: "3.4"
 services:
   php:
     build:
-      context: ./api
+      context: api/
+      dockerfile: Dockerfile
       target: api_platform_php
     depends_on:
       - database
@@ -37,6 +38,7 @@ services:
   caddy:
     build:
       context: api/
+      dockerfile: Dockerfile
       target: api_platform_caddy
     depends_on:
       - php
