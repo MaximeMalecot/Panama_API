@@ -104,5 +104,16 @@ RUN chmod +x /usr/local/bin/docker-entrypoint
 
 ENV SYMFONY_PHPUNIT_VERSION=9
 
+RUN set -e && \
+    apk add openssl && \
+    php bin/console lexik:jwt:generate-keypair --overwrite && \
+    setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt && \
+    setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt 
+
+RUN php bin/console doctrine:migrations:migrate --quiet
+
+RUN php bin/console d:m:m --no-interaction
+
+EXPOSE 80
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
