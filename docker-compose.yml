@@ -4,7 +4,7 @@ services:
   php:
     build:
       context: api/
-      dockerfile: Dockerfile
+      dockerfile: local.Dockerfile
       target: api_platform_php
     depends_on:
       - database
@@ -38,7 +38,7 @@ services:
   caddy:
     build:
       context: api/
-      dockerfile: Dockerfile
+      dockerfile: local.Dockerfile
       target: api_platform_caddy
     depends_on:
       - php
