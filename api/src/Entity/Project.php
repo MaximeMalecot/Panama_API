@@ -32,6 +32,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'groups' => ['project_get_own']
     ]
 )]
+#[Get(
+    name: 'get_propositions_for_project',
+    uriTemplate: '/projects/{id}/propositions',
+    security: "is_granted('ROLE_ADMIN') or object.getOwner() === user",
+    normalizationContext: [
+        'groups' => ['project_get_propositions']
+    ]
+)]
 #[GetCollection(
     security: "is_granted('ROLE_FREELANCER') or is_granted('ROLE_CLIENT')",
     normalizationContext: [
@@ -53,15 +61,15 @@ class Project
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["project_get", "project_cget", "project_get_own"])]
+    #[Groups(["project_get", "project_cget", "project_get_own", "project_get_propositions", "proposition_cget"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["project_get", "project_cget", "project_get_own"])]
+    #[Groups(["project_get", "project_cget", "project_get_own", "project_get_propositions", "proposition_cget"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["project_get", "project_get_own"])]
+    #[Groups(["project_get", "project_get_own", "project_get_propositions"])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'createdProjects')]
@@ -69,11 +77,11 @@ class Project
     private ?User $owner = null;
 
     #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects')]
-    #[Groups(["project_get", "project_cget", "project_get_own"])]
+    #[Groups(["project_get", "project_cget", "project_get_own", "project_get_propositions"])]
     private Collection $filters;
 
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: Proposition::class)]
-    #[Groups(["project_get_own"])]
+    #[Groups(["project_get_own", "project_get_propositions"])]
     private Collection $propositions;
 
     #[ORM\OneToOne(mappedBy: 'project', cascade: ['persist', 'remove'])]
@@ -81,19 +89,19 @@ class Project
     private ?Invoice $invoice = null;
 
     #[ORM\Column]
-    #[Groups(["project_get", "project_get_own"])]
+    #[Groups(["project_get", "project_get_own", "project_get_propositions", "proposition_cget"])]
     private ?int $minPrice = null;
 
     #[ORM\Column]
-    #[Groups(["project_get", "project_get_own"])]
+    #[Groups(["project_get", "project_get_own", "project_get_propositions", "proposition_cget"])]
     private ?int $maxPrice = null;
 
     #[ORM\Column(length: 255, options: ['default' => 'CREATED'])]
-    #[Groups(["project_get_own"])]
+    #[Groups(["project_get_own", "project_get_propositions"])]
     private ?string $status = "CREATED";
 
     #[ORM\Column]
-    #[Groups(["project_get", "project_get_own"])]
+    #[Groups(["project_get", "project_get_own", "project_get_propositions", "proposition_cget"])]
     private ?int $length = null;
     
     #[ORM\Column(length: 128, unique: true)]
