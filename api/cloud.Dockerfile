@@ -53,11 +53,6 @@ RUN apk add --no-cache --virtual .pgsql-deps postgresql-dev; \
 ###< doctrine/doctrine-bundle ###
 ###< recipes ###
 
-COPY docker/php/create-dot-env.sh . 
-RUN chmod +x create-dot-env.sh; \
-	./create-dot-env.sh; \
-	rm create-dot-env.sh
-
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini
@@ -73,9 +68,26 @@ ENV PATH="${PATH}:/root/.composer/vendor/bin"
 
 WORKDIR /srv/api
 
+# build for production
+ARG APP_ENV=prod
+
+# prevent the reinstallation of vendors at every changes in the source code
+COPY composer.json composer.lock symfony.lock ./
+RUN set -eux; \
+	composer install --prefer-dist --no-dev --no-scripts --no-progress; \
+	composer clear-cache
+
+# copy only specifically what we need
+# COPY .env .
+COPY bin bin/
+COPY config config/
+COPY migrations migrations/
+COPY public public/
+COPY src src/
+COPY templates templates/
+
 ARG TRUSTED_PROXIES \
     TRUSTED_HOSTS \
-    APP_ENV \
     APP_SECRET \
     DATABASE_URL \
     MAILER_DSN \
@@ -112,22 +124,7 @@ ENV TRUSTED_PROXIES=$TRUSTED_PROXIES \
 COPY docker/php/create-dot-env.sh . 
 RUN chmod +x create-dot-env.sh; \
 	./create-dot-env.sh; \
-	rm create-dot-env.sh
-
-# prevent the reinstallation of vendors at every changes in the source code
-COPY composer.json composer.lock symfony.lock ./
-RUN set -eux; \
-	composer install --prefer-dist --no-dev --no-scripts --no-progress; \
-	composer clear-cache
-
-# copy only specifically what we need
-
-COPY bin bin/
-COPY config config/
-COPY migrations migrations/
-COPY public public/
-COPY src src/
-COPY templates templates/
+	rm create-dot-env.sh;
 
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
@@ -146,7 +143,6 @@ COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
 RUN php bin/console lexik:jwt:generate-keypair --overwrite --quiet; \
-	php bin/console make:migration --quiet; \
 	php bin/console d:m:m --no-interaction --quiet;
 
 ENV SYMFONY_PHPUNIT_VERSION=9
