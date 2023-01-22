@@ -29,7 +29,7 @@ class WebhookController extends AbstractController
     #[Route('/stripe', name: 'stripe_payment')]
     public function stripePayment(Request $request, EntityManagerInterface $em, InvoiceRepository $invoiceRepository, UserRepository $userRepository)
     {
-        $webhookSecret = $_ENV['STRIPE_WH_PAYMENT_SK'];
+        $webhookSecret = $_ENV['STRIPE_WH_SK'];
         $signature = $request->headers->get('stripe-signature');
 
         try{

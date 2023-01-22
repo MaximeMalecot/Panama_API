@@ -53,6 +53,11 @@ RUN apk add --no-cache --virtual .pgsql-deps postgresql-dev; \
 ###< doctrine/doctrine-bundle ###
 ###< recipes ###
 
+COPY docker/php/create-dot-env.sh . 
+RUN chmod +x create-dot-env.sh; \
+	./create-dot-env.sh; \
+	rm create-dot-env.sh
+
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini
@@ -68,8 +73,46 @@ ENV PATH="${PATH}:/root/.composer/vendor/bin"
 
 WORKDIR /srv/api
 
-# build for production
-ARG APP_ENV=prod
+ARG TRUSTED_PROXIES \
+    TRUSTED_HOSTS \
+    APP_ENV \
+    APP_SECRET \
+    DATABASE_URL \
+    MAILER_DSN \
+    CORS_ALLOW_ORIGIN \
+    MERCURE_URL \
+    MERCURE_PUBLIC_URL \
+    MERCURE_JWT_SECRET \
+    JWT_PASSPHRASE \
+    STRIPE_PK \
+    STRIPE_SK \
+    STRIPE_WH_SK \
+    FRONT_URL \
+    KYC_API_URL \
+    KYC_API_SECRET
+
+ENV TRUSTED_PROXIES=$TRUSTED_PROXIES \
+    TRUSTED_HOSTS=$TRUSTED_HOSTS \
+    APP_ENV=$APP_ENV \
+    APP_SECRET=$APP_SECRET \
+    DATABASE_URL=$DATABASE_URL \
+    MAILER_DSN=$MAILER_DSN \
+    CORS_ALLOW_ORIGIN=$CORS_ALLOW_ORIGIN \
+    MERCURE_URL=$MERCURE_URL \
+    MERCURE_PUBLIC_URL=$MERCURE_PUBLIC_URL \
+    MERCURE_JWT_SECRET=$MERCURE_JWT_SECRET \
+    JWT_PASSPHRASE=$JWT_PASSPHRASE \
+    STRIPE_PK=$STRIPE_PK \
+    STRIPE_SK=$STRIPE_SK \
+    STRIPE_WH_SK=$STRIPE_WH_SK \
+    FRONT_URL=$FRONT_URL \
+    KYC_API_URL=$KYC_API_URL \
+    KYC_API_SECRET=$KYC_API_SECRET
+
+COPY docker/php/create-dot-env.sh . 
+RUN chmod +x create-dot-env.sh; \
+	./create-dot-env.sh; \
+	rm create-dot-env.sh
 
 # prevent the reinstallation of vendors at every changes in the source code
 COPY composer.json composer.lock symfony.lock ./
@@ -78,7 +121,7 @@ RUN set -eux; \
 	composer clear-cache
 
 # copy only specifically what we need
-COPY .env ./
+
 COPY bin bin/
 COPY config config/
 COPY migrations migrations/
@@ -102,17 +145,11 @@ HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
 COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
+RUN php bin/console lexik:jwt:generate-keypair --overwrite --quiet; \
+	php bin/console make:migration --quiet; \
+	php bin/console d:m:m --no-interaction --quiet;
+
 ENV SYMFONY_PHPUNIT_VERSION=9
-
-RUN set -e && \
-    apk add openssl && \
-    php bin/console lexik:jwt:generate-keypair --overwrite && \
-    setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt && \
-    setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt 
-
-RUN php bin/console doctrine:migrations:migrate --quiet
-
-RUN php bin/console d:m:m --no-interaction
 
 EXPOSE 80
 ENTRYPOINT ["docker-entrypoint"]
