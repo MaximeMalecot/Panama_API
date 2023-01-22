@@ -1,0 +1,70 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--build-arg'
+      - 'TRUSTED_PROXIES=${_TRUSTED_PROXIES}'
+      - '--build-arg'
+      - 'TRUSTED_HOSTS=${_TRUSTED_HOSTS}'
+      - '--build-arg'
+      - 'APP_SECRET=${_APP_SECRET}'
+      - '--build-arg'
+      - 'DATABASE_URL=${_DATABASE_URL}'
+      - '--build-arg'
+      - 'MAILER_DSN=${_MAILER_DSN}'
+      - '--build-arg'
+      - 'CORS_ALLOW_ORIGIN=${_CORS_ALLOW_ORIGIN}'
+      - '--build-arg'
+      - 'MERCURE_URL=${_MERCURE_URL}'
+      - '--build-arg'
+      - 'MERCURE_PUBLIC_URL=${_MERCURE_PUBLIC_URL}'
+      - '--build-arg'
+      - 'MERCURE_JWT_SECRET=${_MERCURE_JWT_SECRET}'
+      - '--build-arg'
+      - 'JWT_PASSPHRASE=${_JWT_PASSPHRASE}'
+      - '--build-arg'
+      - 'STRIPE_PK=${_STRIPE_PK}'
+      - '--build-arg'
+      - 'STRIPE_SK=${_STRIPE_SK}'
+      - '--build-arg'
+      - 'STRIPE_WH_SK=${_STRIPE_WH_SK}'
+      - '--build-arg'
+      - 'FRONT_URL=${_FRONT_URL}'
+      - '--build-arg'
+      - 'KYC_API_URL=${_KYC_API_URL}'
+      - '--build-arg'
+      - 'KYC_API_SECRET=${_KYC_API_SECRET}'
+      - '--no-cache'
+      - '-t'
+      - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+      - api
+      - '-f'
+      - api/cloud.Dockerfile
+    id: Build
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+    id: Push
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - run
+      - services
+      - update
+      - $_SERVICE_NAME
+      - '--platform=managed'
+      - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+      - >-
+        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID,$_LABELS
+      - '--region=$_DEPLOY_REGION'
+      - '--quiet'
+    id: Deploy
+    entrypoint: gcloud
+images:
+  - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+options:
+  substitutionOption: ALLOW_LOOSE
+tags:
+  - gcp-cloud-build-deploy-cloud-run
+  - gcp-cloud-build-deploy-cloud-run-managed
+  - challenge-s1-g6-api
