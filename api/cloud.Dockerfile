@@ -1,5 +1,4 @@
-ARG PHP_VERSION=8.1
-FROM php:${PHP_VERSION}-fpm-alpine
+FROM php:8.1-fpm-alpine  as api_platform_php
 
 # persistent / runtime deps
 RUN apk add --no-cache \
@@ -147,6 +146,26 @@ RUN php bin/console lexik:jwt:generate-keypair --overwrite --quiet;
 ENV SYMFONY_PHPUNIT_VERSION=9
 
 EXPOSE 8080
+
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
 
+
+# "caddy" stage
+# depends on the "php" stage above
+FROM caddy:2-builder-alpine AS api_platform_caddy_builder
+
+# install Mercure and Vulcain modules
+RUN xcaddy build \
+    --with github.com/dunglas/mercure \
+    --with github.com/dunglas/mercure/caddy \
+    --with github.com/dunglas/vulcain \
+    --with github.com/dunglas/vulcain/caddy
+
+FROM caddy:2 AS api_platform_caddy
+
+WORKDIR /srv/api
+
+COPY --from=api_platform_caddy_builder /usr/bin/caddy /usr/bin/caddy
+COPY --from=api_platform_php /srv/api/public public/
+COPY docker/caddy/Caddyfile /etc/caddy/Caddyfile
