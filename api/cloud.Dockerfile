@@ -1,5 +1,5 @@
 ARG PHP_VERSION=8.1
-FROM php:${PHP_VERSION}-fpm-alpine
+FROM php:${PHP_VERSION}-apache
 
 # persistent / runtime deps
 RUN apk add --no-cache \
@@ -142,11 +142,11 @@ HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
 COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
-RUN php bin/console lexik:jwt:generate-keypair --overwrite --quiet; \
-	php bin/console d:m:m --no-interaction --quiet;
+RUN php bin/console lexik:jwt:generate-keypair --overwrite --quiet;
 
 ENV SYMFONY_PHPUNIT_VERSION=9
 
-EXPOSE 80
+EXPOSE 8080
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
+
