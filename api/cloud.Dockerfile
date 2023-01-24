@@ -145,11 +145,8 @@ RUN php bin/console lexik:jwt:generate-keypair --overwrite --quiet;
 
 ENV SYMFONY_PHPUNIT_VERSION=9
 
-EXPOSE 8080
-
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
-
 
 # "caddy" stage
 # depends on the "php" stage above
@@ -164,8 +161,17 @@ RUN xcaddy build \
 
 FROM caddy:2 AS api_platform_caddy
 
+ARG SERVER_NAME=localhost \
+	MERCURE_PUBLISHER_JWT_KEY=!ChangeMe! \
+    MERCURE_SUBSCRIBER_JWT_KEY=!ChangeMe!
+
+ENV SERVER_NAME=$SERVER_NAME \
+	MERCURE_PUBLISHER_JWT_KEY=$MERCURE_PUBLISHER_JWT_KEY \
+	MERCURE_SUBSCRIBER_JWT_KEY=$MERCURE_SUBSCRIBER_JWT_KEY
+
 WORKDIR /srv/api
 
+EXPOSE 80
 COPY --from=api_platform_caddy_builder /usr/bin/caddy /usr/bin/caddy
 COPY --from=api_platform_php /srv/api/public public/
 COPY docker/caddy/Caddyfile /etc/caddy/Caddyfile
