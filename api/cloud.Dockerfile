@@ -1,5 +1,5 @@
 ARG PHP_VERSION=8.1
-FROM php:${PHP_VERSION}-apache
+FROM php:${PHP_VERSION}-fpm-alpine
 
 # persistent / runtime deps
 RUN apk add --no-cache \
