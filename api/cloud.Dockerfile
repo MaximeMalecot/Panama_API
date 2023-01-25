@@ -107,5 +107,7 @@ COPY docker/php/apache.conf /etc/apache2/sites-enabled/000-default.conf
 COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
+EXPOSE 80
+
 CMD ["apache2-foreground"]
 ENTRYPOINT ["docker-entrypoint"]
