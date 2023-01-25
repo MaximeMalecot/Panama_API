@@ -1,5 +1,4 @@
 #!/bin/sh
-PHP_INI_DIR="/usr/local/etc/php/conf.d"
 
 PHP_INI_RECOMMENDED="$PHP_INI_DIR/php.ini-production"
 if [ "$APP_ENV" != 'prod' ]; then
