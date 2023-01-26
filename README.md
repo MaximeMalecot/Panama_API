@@ -1,21 +1,49 @@
-# Install 
+
+# Install
+
+  
 
 ```
-  cp ./api/.env.example ./api/.env
-  docker compose build --pull --no-cache
-  docker compose up -d
+
+cp ./api/.env.example ./api/.env
+
+docker compose build --pull --no-cache
+
+docker compose up -d
+
 ```
 
-wait for dependencies to install and then 
+  
+
+wait for dependencies to install and then
+
+  
 
 ```
-  docker compose exec php sh -c '
-    set -e
-    apk add openssl
-    php bin/console lexik:jwt:generate-keypair
-    setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
-    setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
-  '
-  docker compose exec php php bin/console m:mig
-  docker compose exec php php bin/console d:m:m
+
+docker compose exec php sh -c '
+
+set -e
+
+apk add openssl
+
+php bin/console lexik:jwt:generate-keypair
+
+setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
+
+setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt
+
+'
+
+docker compose exec php php bin/console m:mig
+
+docker compose exec php php bin/console d:m:m
+
 ```
+# Listening Stripe events locally
+
+To use the Stripe webhooks without hosting the application, you might need to install the Stripe CLI  [https://stripe.com/docs/stripe-cli](https://stripe.com/docs/stripe-cli)
+
+Once the settings are done, use the following command in your shell
+
+stripe listen --skip-verify --forward-to https://localhost/webhook/stripe
