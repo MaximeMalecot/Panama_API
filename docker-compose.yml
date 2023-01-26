@@ -7,7 +7,6 @@ services:
       dockerfile: local.Dockerfile
     depends_on:
       - database
-    restart: unless-stopped
     volumes:
       - php_socket:/var/run/php
     ports:
