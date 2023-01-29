@@ -32,7 +32,11 @@ class JWTCreatedListener
         $payload['userId'] = $user->getId();
         $payload['isVerified'] = $user->getIsVerified();
         if(in_array('ROLE_FREELANCER', $user->getRoles())){
-            $payload['isInfoVerified'] = $user->getFreelancerInfo()->getIsVerified();
+            if($user->getFreelancerInfo()){
+                $payload['isInfoVerified'] = $user->getFreelancerInfo()->getIsVerified();
+            } else {
+                $payload['isInfoVerified'] = false;
+            }
         }
 
         $event->setData($payload);

@@ -4,15 +4,16 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
 use App\Dto\FreelancerInfoKYCDto;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\State\FreelancerInfoKYCProcessor;
+use Doctrine\Common\Collections\Collection;
 use App\Repository\FreelancerInfoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
@@ -20,6 +21,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
     security: "is_granted('ROLE_ADMIN') or object.getFreelancer() == user",
     normalizationContext: [
         'groups' => ['freelancer_info_get']
+    ]
+)]
+#[Patch(
+    security: "is_granted('ROLE_ADMIN') or (object.getClient() === user and is_granted('ROLE_FREELANCER'))",
+    normalizationContext: [
+        'groups' => ["freelancerInfo_get"]
+    ],
+    denormalizationContext: [
+        'groups' => ["freelancerInfo_patch"]
     ]
 )]
 #[GetCollection(
@@ -50,19 +60,19 @@ class FreelancerInfo
     private ?bool $isVerified = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancerInfo_patch"])]
     private ?string $description = null;
 
     #[ORM\Column(length: 12, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancerInfo_patch"])]
     private ?string $phoneNb = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancerInfo_patch"])]
     private ?string $address = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancerInfo_patch"])]
     private ?string $city = null;
 
     #[ORM\OneToOne(inversedBy: 'freelancerInfo', cascade: ['persist', 'remove'])]

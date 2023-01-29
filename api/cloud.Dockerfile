@@ -1,84 +1,53 @@
-ARG PHP_VERSION=8.1
-FROM php:${PHP_VERSION}-fpm-alpine
 
-# persistent / runtime deps
-RUN apk add --no-cache \
-		acl \
-		fcgi \
-		file \
-		gettext \
-		git \
-	;
+# Use the official PHP image.
+# https://hub.docker.com/_/php
+FROM php:8.1-apache
 
-ARG APCU_VERSION=5.1.21
-RUN set -eux; \
-	apk add --no-cache --virtual .build-deps \
-		$PHPIZE_DEPS \
-		icu-data-full \
-		icu-dev \
-		libzip-dev \
-		zlib-dev \
-	; \
-	\
-	docker-php-ext-configure zip; \
-	docker-php-ext-install -j$(nproc) \
-		intl \
-		zip \
-	; \
-	pecl install \
-		apcu-${APCU_VERSION} \
-	; \
-	pecl clear-cache; \
-	docker-php-ext-enable \
-		apcu \
-		opcache \
-	; \
-	\
-	runDeps="$( \
-		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
-			| tr ',' '\n' \
-			| sort -u \
-			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-	)"; \
-	apk add --no-cache --virtual .api-phpexts-rundeps $runDeps; \
-	\
-	apk del .build-deps
+# Configure PHP for Cloud Run.
+# Precompile PHP code with opcache.
+RUN a2enmod rewrite
 
-###> recipes ###
-###> doctrine/doctrine-bundle ###
-RUN apk add --no-cache --virtual .pgsql-deps postgresql-dev; \
-	docker-php-ext-install -j$(nproc) pdo_pgsql; \
-	apk add --no-cache --virtual .pgsql-rundeps so:libpq.so.5; \
-	apk del .pgsql-deps
-###< doctrine/doctrine-bundle ###
-###< recipes ###
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libssl-dev zlib1g-dev curl git unzip netcat libxml2-dev libpq-dev libzip-dev && \
+    pecl install apcu && \
+    docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql && \
+    docker-php-ext-install -j$(nproc) zip opcache intl pdo_pgsql pgsql && \
+    docker-php-ext-enable apcu pdo_pgsql sodium && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN set -ex; \
+  { \
+    echo "; Cloud Run enforces memory & timeouts"; \
+    echo "memory_limit = -1"; \
+    echo "max_execution_time = 0"; \
+    echo "; File upload at Cloud Run network limit"; \
+    echo "upload_max_filesize = 32M"; \
+    echo "post_max_size = 32M"; \
+    echo "; Configure Opcache for Containers"; \
+    echo "opcache.enable = On"; \
+    echo "opcache.validate_timestamps = Off"; \
+    echo "; Configure Opcache Memory (Application-specific)"; \
+    echo "opcache.memory_consumption = 32"; \
+  } > "$PHP_INI_DIR/conf.d/cloud-run.ini"
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-RUN ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini
-COPY docker/php/conf.d/api-platform.prod.ini $PHP_INI_DIR/conf.d/api-platform.ini
-
-COPY docker/php/php-fpm.d/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
-
-VOLUME /var/run/php
-
-# https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
 
-WORKDIR /srv/api
+
+WORKDIR /var/www
 
 # build for production
 ARG APP_ENV=prod
 
-# prevent the reinstallation of vendors at every changes in the source code
 COPY composer.json composer.lock symfony.lock ./
 RUN set -eux; \
 	composer install --prefer-dist --no-dev --no-scripts --no-progress; \
 	composer clear-cache
 
-# copy only specifically what we need
-# COPY .env .
 COPY bin bin/
 COPY config config/
 COPY migrations migrations/
@@ -89,7 +58,13 @@ COPY templates templates/
 ARG TRUSTED_PROXIES \
     TRUSTED_HOSTS \
     APP_SECRET \
-    DATABASE_URL \
+    DB_NAME \
+    DB_HOST \
+    DB_PORT \
+    DB_USER \
+    DB_PASSWORD \
+    DB_VERSION \
+    DB_CHARSET \
     MAILER_DSN \
     CORS_ALLOW_ORIGIN \
     MERCURE_URL \
@@ -107,7 +82,13 @@ ENV TRUSTED_PROXIES=$TRUSTED_PROXIES \
     TRUSTED_HOSTS=$TRUSTED_HOSTS \
     APP_ENV=$APP_ENV \
     APP_SECRET=$APP_SECRET \
-    DATABASE_URL=$DATABASE_URL \
+    DB_NAME=$DB_NAME \
+    DB_HOST=$DB_HOST \
+    DB_PORT=$DB_PORT \
+    DB_USER=$DB_USER \
+    DB_PASSWORD=$DB_PASSWORD \
+    DB_VERSION=$DB_VERSION \
+    DB_CHARSET=$DB_CHARSET \
     MAILER_DSN=$MAILER_DSN \
     CORS_ALLOW_ORIGIN=$CORS_ALLOW_ORIGIN \
     MERCURE_URL=$MERCURE_URL \
@@ -121,7 +102,7 @@ ENV TRUSTED_PROXIES=$TRUSTED_PROXIES \
     KYC_API_URL=$KYC_API_URL \
     KYC_API_SECRET=$KYC_API_SECRET
 
-COPY docker/php/create-dot-env.sh . 
+COPY docker/create-dot-env.sh . 
 RUN chmod +x create-dot-env.sh; \
 	./create-dot-env.sh; \
 	rm create-dot-env.sh;
@@ -132,21 +113,14 @@ RUN set -eux; \
 	composer dump-env prod; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync
-VOLUME /srv/api/var
 
-COPY docker/php/docker-healthcheck.sh /usr/local/bin/docker-healthcheck
-RUN chmod +x /usr/local/bin/docker-healthcheck
+COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
+RUN sed -i 's/80/80/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
-
-COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
-RUN php bin/console lexik:jwt:generate-keypair --overwrite --quiet;
+EXPOSE 80
 
-ENV SYMFONY_PHPUNIT_VERSION=9
-
-EXPOSE 8080
+CMD ["apache2-foreground"]
 ENTRYPOINT ["docker-entrypoint"]
-CMD ["php-fpm"]
-
