@@ -44,12 +44,11 @@ COPY templates templates/
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
-	composer dump-env prod; \
+	composer dump-env ${APP_ENV}; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync
 
 COPY docker/php/apache.conf /etc/apache2/sites-enabled/000-default.conf
-RUN sed -i 's/80/80/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
 COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint

@@ -14,7 +14,7 @@ if [ ! -d "./config/jwt" ]; then
 	php bin/console lexik:jwt:generate-keypair --quiet
 fi
 
-if grep -q DATABASE_URL= .env; then
+if grep -q DB_HOST= .env; then
 	echo "Waiting for database to be ready..."
 	ATTEMPTS_LEFT_TO_REACH_DATABASE=60
 	until [ $ATTEMPTS_LEFT_TO_REACH_DATABASE -eq 0 ] || DATABASE_ERROR=$(php bin/console dbal:run-sql -q "SELECT 1" 2>&1); do
@@ -34,13 +34,13 @@ if grep -q DATABASE_URL= .env; then
 		exit 1
 	else
 		echo "The database is now ready and reachable"
-	fi
 
-	if [ "$( find ./migrations -iname '*.php' -print -quit )" ]; then
-		php bin/console doctrine:migrations:migrate --no-interaction --quiet
-	fi
-	if [ "$APP_ENV" != 'prod' ]; then
-		php bin/console d:f:l --no-interaction --quiet
+		if [ "$( find ./migrations -iname '*.php' -print -quit )" ]; then
+			php bin/console doctrine:migrations:migrate --no-interaction --quiet
+		fi
+		if [ "$APP_ENV" != 'prod' ]; then
+			php bin/console d:f:l --no-interaction --quiet
+		fi
 	fi
 fi
 
