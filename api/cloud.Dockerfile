@@ -102,7 +102,7 @@ ENV TRUSTED_PROXIES=$TRUSTED_PROXIES \
     KYC_API_URL=$KYC_API_URL \
     KYC_API_SECRET=$KYC_API_SECRET
 
-COPY docker/php/create-dot-env.sh . 
+COPY docker/create-dot-env.sh . 
 RUN chmod +x create-dot-env.sh; \
 	./create-dot-env.sh; \
 	rm create-dot-env.sh;
@@ -114,10 +114,10 @@ RUN set -eux; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync
 
-COPY docker/php/apache.conf /etc/apache2/sites-enabled/000-default.conf
+COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
 RUN sed -i 's/80/80/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
 EXPOSE 80

@@ -48,9 +48,9 @@ RUN set -eux; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync
 
-COPY docker/php/apache.conf /etc/apache2/sites-enabled/000-default.conf
+COPY docker/apache.conf /etc/apache2/sites-enabled/000-default.conf
 
-COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
 EXPOSE 80

@@ -7,10 +7,12 @@ fi
 ln -sf "$PHP_INI_RECOMMENDED" "$PHP_INI_DIR/php.ini"
 
 if [ "$APP_ENV" != 'prod' ]; then
+	echo "Intalling dependencies..."
 	composer install --prefer-dist --no-progress --no-interaction
 fi
 
 if [ ! -d "./config/jwt" ]; then
+	echo "Generating jwt keys..."
 	php bin/console lexik:jwt:generate-keypair --quiet
 fi
 
@@ -36,12 +38,15 @@ if grep -q DB_HOST= .env; then
 		echo "The database is now ready and reachable"
 
 		if [ "$( find ./migrations -iname '*.php' -print -quit )" ]; then
+			echo "Executing migrations..."
 			php bin/console doctrine:migrations:migrate --no-interaction --quiet
 		fi
 		if [ "$APP_ENV" != 'prod' ]; then
+			echo "Executing fixtures..."
 			php bin/console d:f:l --no-interaction --quiet
 		fi
 	fi
 fi
 
+echo "Environnement ready, starting server..."
 exec docker-php-entrypoint "$@"

@@ -16,6 +16,9 @@ services:
       timeout: 3s
       retries: 3
       start_period: 30s
+    networks:
+      - apis
+      - db
     
   kyc:
     build: ./kyc_api
@@ -27,6 +30,8 @@ services:
       - PORT=3000
     ports:
       - 3000:3000
+    networks:
+      - apis
 
   database:
     image: postgres:${POSTGRES_VERSION:-13}-alpine
@@ -36,12 +41,23 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:-api-platform}
     volumes:
       - db_challenge_data:/var/lib/postgresql/data:rw
+    networks:
+      - db
+      - dbadmin
+
   adminer:
     image: adminer
     depends_on:
       - database
     ports:
       - 8080:8080
+    networks:
+      - dbadmin
+
+networks:
+  apis:
+  db:
+  dbadmin:
 
 volumes:
   php_socket:

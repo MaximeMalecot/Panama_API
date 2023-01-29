@@ -5,7 +5,6 @@ services:
   php:
     volumes:
       - ./api:/var/www:rw,cached
-      - ./api/docker/php/conf.d/api-platform.dev.ini:/usr/local/etc/php/conf.d/api-platform.ini
     environment:
       APP_ENV: dev
       
