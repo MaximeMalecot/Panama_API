@@ -53,7 +53,7 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
         $result = curl_exec($ch);
         $httpReturnCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        dump($result, $ch, $httpReturnCode)
+        dump($result, $ch, $httpReturnCode);
 
         return null;
     }
