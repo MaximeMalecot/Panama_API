@@ -30,6 +30,8 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
             $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
         }
 
+        dump($user, $baseUrl);
+
         $uri = array(
             "success_uri" => $baseUrl."/webhook/kyc_verification/{$user->getId()}?status=success",
             "error_uri" => $baseUrl."/webhook/kyc_verification/{$user->getId()}?status=failed",
@@ -50,6 +52,8 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
         
         $result = curl_exec($ch);
         $httpReturnCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        dump($result, $ch, $httpReturnCode)
 
         return null;
     }
