@@ -26,10 +26,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[Patch(
     security: "is_granted('ROLE_ADMIN') or (object.getFreelancer() === user and is_granted('ROLE_FREELANCER'))",
     normalizationContext: [
-        'groups' => ["freelancerInfo_get"]
+        'groups' => ["freelancer_info_get"]
     ],
     denormalizationContext: [
-        'groups' => ["freelancerInfo_patch"]
+        'groups' => ["freelancer_info_patch"]
     ]
 )]
 #[GetCollection(
@@ -59,19 +59,19 @@ class FreelancerInfo
     private ?bool $isVerified = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancerInfo_patch"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
     private ?string $description = null;
 
     #[ORM\Column(length: 12, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancerInfo_patch"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
     private ?string $phoneNb = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancerInfo_patch"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
     private ?string $address = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancerInfo_patch"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
     private ?string $city = null;
 
     #[ORM\OneToOne(inversedBy: 'freelancerInfo', cascade: ['persist', 'remove'])]
