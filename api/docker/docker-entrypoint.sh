@@ -6,9 +6,15 @@ if [ "$APP_ENV" != 'prod' ]; then
 fi
 ln -sf "$PHP_INI_RECOMMENDED" "$PHP_INI_DIR/php.ini"
 
+setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var
+setfacl -dR -m u:www-data:rwX -m u:"$(whoami)":rwX var
+
 if [ "$APP_ENV" != 'prod' ]; then
 	echo "Intalling dependencies..."
 	composer install --prefer-dist --no-progress --no-interaction
+else
+	echo "Warming up cache..."
+	php bin/console cache:clear --no-interaction --quiet
 fi
 
 if [ ! -d "./config/jwt" ]; then

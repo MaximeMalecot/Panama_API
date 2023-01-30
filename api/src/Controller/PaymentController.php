@@ -97,8 +97,7 @@ class PaymentController extends AbstractController
         if(!$session->url){
             return $this->json(['error' => 'error'], 500);
         }
-
-        dump($session->url);
+        
         return $this->json([
             'url' => $session->url
         ], 200);

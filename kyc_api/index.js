@@ -5,10 +5,6 @@ const app = express();
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 app.use(express.json());
 
-app.post("/success", (req, res) => {
-    console.log("SUCCESS_URI CALLED");
-});
-
 app.post("/check", async (req, res) => {
     try {
         console.log(req.body)
@@ -23,10 +19,13 @@ app.post("/check", async (req, res) => {
             throw new Error("Missing data field(s)");
         if (!success_uri || !error_uri)
             throw new Error("Missing one or both uri");
+        
+        console.log("valid request");
 
         res.sendStatus(204);
 
         setTimeout(async () => {
+            console.log("sending success");
             await fetch(success_uri, {
                 method: "POST",
                 headers: {

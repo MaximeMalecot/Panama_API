@@ -25,7 +25,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[Get(
-    name: 'get_project_by_owner',
     uriTemplate: '/projects/owner',
     security: "object.getOwner() === user",
     normalizationContext: [
@@ -33,7 +32,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[Get(
-    name: 'get_propositions_for_project',
     uriTemplate: '/projects/{id}/propositions',
     security: "is_granted('ROLE_ADMIN') or object.getOwner() === user",
     normalizationContext: [

@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[Patch(
-    security: "is_granted('ROLE_ADMIN') or (object.getClient() === user and is_granted('ROLE_FREELANCER'))",
+    security: "is_granted('ROLE_ADMIN') or (object.getFreelancer() === user and is_granted('ROLE_FREELANCER'))",
     normalizationContext: [
         'groups' => ["freelancerInfo_get"]
     ],
@@ -40,8 +40,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 #[Post(
     security: "is_granted('FREELANCER_VERIFY')",
-    name: 'freelancer_info_kyc',
-    uriTemplate: '/freelancer_info/kyc', 
+    uriTemplate: '/freelancer_infos/kyc', 
     input: FreelancerInfoKYCDto::class, 
     processor: FreelancerInfoKYCProcessor::class,
     status: 204

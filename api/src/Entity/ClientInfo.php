@@ -7,7 +7,6 @@ use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GetCollection;
 use App\Repository\ClientInfoRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 

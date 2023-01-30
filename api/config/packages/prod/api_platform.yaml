@@ -11,15 +11,16 @@ api_platform:
             JWT:
                 name: Authorization
                 type: header
-    # Enable Swagger UI.
+    # Enabling only JSON-LD and JSON formats while disabling HTML format
+    formats:
+        json:
+            mime_types: ['application/json']
+    # Disabling the displaying of the API documentation 
     enable_swagger_ui: false
-    # Enable ReDoc.
     enable_re_doc: false
-    # Enable the docs.
     enable_docs: false
-    # Enable the data collector and the WebProfilerBundle integration.
-    enable_profiler: false
-    # Good cache defaults for REST APIs
+    enable_entrypoint: false
+
     defaults:
         pagination_items_per_page: 30
         stateless: true

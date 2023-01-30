@@ -14,7 +14,6 @@ use App\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]

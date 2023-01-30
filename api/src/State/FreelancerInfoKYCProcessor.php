@@ -24,8 +24,11 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
         if ( $user->getFreelancerInfo()->getIsVerified() ) {
             return null;
         }
-
-        $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
+        if(isset($_ENV['SERVER_DNS'])){
+            $baseUrl = "http://".$_ENV['SERVER_DNS'];
+        } else {
+            $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
+        }
 
         $uri = array(
             "success_uri" => $baseUrl."/webhook/kyc_verification/{$user->getId()}?status=success",
@@ -46,8 +49,7 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
         );
         
         $result = curl_exec($ch);
-        
-        dump($body_string);
+        $httpReturnCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         return null;
     }

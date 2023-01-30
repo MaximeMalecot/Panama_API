@@ -6,7 +6,7 @@ services:
     volumes:
       - ./api:/var/www:rw,cached
     environment:
-      APP_ENV: dev
+      APP_ENV: prod
       
   database:
     ports:

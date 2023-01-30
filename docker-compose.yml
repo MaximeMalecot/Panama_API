@@ -26,6 +26,7 @@ services:
       - ./kyc_api:/usr/local/server
       - /usr/local/server/node_modules
     working_dir: /usr/local/server
+    restart: always
     environment:
       - PORT=3000
     ports:

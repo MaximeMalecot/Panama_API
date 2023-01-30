@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use App\Entity\Pizza;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
@@ -13,7 +13,6 @@ use App\Dto\UserResetPasswordDto;
 use App\Repository\UserRepository;
 use ApiPlatform\Metadata\ApiResource;
 use App\Controller\RegisterController;
-use Gedmo\Mapping\Annotation as Gedmo;
 use ApiPlatform\Metadata\GetCollection;
 use App\State\UserVerifyEmailProcessor;
 use App\Entity\Traits\TimestampableTrait;
@@ -22,7 +21,6 @@ use App\Controller\ResetPasswordController;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -38,7 +36,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 )]
 #[Get(
     security: 'is_granted("GET_CLIENT", object)',
-    name: 'specific_client',
     uriTemplate: '/users/clients/{id}',
     normalizationContext: [
         'groups' => ['user_get', 'specific_client_get']
@@ -46,7 +43,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 )]
 #[Get(
     security: 'is_granted("GET_FREELANCER", object)',
-    name: 'specific_freelancer',
     uriTemplate: '/users/freelancer/{id}',
     normalizationContext: [
         'groups' => ['user_get', 'specific_freelancer_get']
@@ -58,7 +54,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     ]
 )]
 #[Patch(
-        name: 'forgot_password', 
         uriTemplate: '/users/forgot_password', 
         controller: ResetPasswordController::class,
         denormalizationContext: [
@@ -70,14 +65,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     )
 ]
 #[Patch(
-    name: 'resetPwd', 
     uriTemplate: '/users/update_password', 
     input: UserResetPasswordDto::class,
     output: User::class,
     processor: UserResetPasswordProcessor::class
 )]
 #[Patch(
-    name: 'verify_email',
     uriTemplate: '/users/verify_email',
     input: UserVerifyEmailDto::class,
     output: User::class,
@@ -94,7 +87,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     ]
 )]
 #[Post(
-    name: 'register', 
     uriTemplate: '/register', 
     controller: RegisterController::class,
     denormalizationContext: [
