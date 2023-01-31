@@ -27,7 +27,7 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
         if(isset($_ENV['SERVER_DNS'])){
             $baseUrl = "http://".$_ENV['SERVER_DNS'];
         } else {
-            $baseUrl = (isset($_ENV['HTTPS_PROXY']) ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
+            $baseUrl = (isset($_ENV['CURL_ENV']) ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
         }
 
         $uri = array(
