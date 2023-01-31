@@ -6,7 +6,8 @@ services:
     volumes:
       - ./api:/var/www:rw,cached
     environment:
-      APP_ENV: prod
+      APP_ENV: dev
+      FRONT_URL: http://kyc:3000/check
       
   database:
     ports:

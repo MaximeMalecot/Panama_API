@@ -1,10 +1,5 @@
-
-# Use the official PHP image.
-# https://hub.docker.com/_/php
 FROM php:8.1-apache
 
-# Configure PHP for Cloud Run.
-# Precompile PHP code with opcache.
 RUN a2enmod rewrite
 
 RUN apt-get update && \
@@ -15,14 +10,12 @@ RUN apt-get update && \
     docker-php-ext-enable apcu pdo_pgsql sodium && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
-
 
 WORKDIR /var/www
 

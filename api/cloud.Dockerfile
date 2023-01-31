@@ -1,6 +1,3 @@
-
-# Use the official PHP image.
-# https://hub.docker.com/_/php
 FROM php:8.1-apache
 
 # Configure PHP for Cloud Run.
@@ -37,10 +34,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
 
-
 WORKDIR /var/www
 
-# build for production
 ARG APP_ENV=prod
 
 COPY composer.json composer.lock symfony.lock ./
@@ -48,66 +43,13 @@ RUN set -eux; \
 	composer install --prefer-dist --no-dev --no-scripts --no-progress; \
 	composer clear-cache
 
+COPY .env .
 COPY bin bin/
 COPY config config/
 COPY migrations migrations/
 COPY public public/
 COPY src src/
 COPY templates templates/
-
-ARG TRUSTED_PROXIES \
-    TRUSTED_HOSTS \
-    APP_SECRET \
-    DB_NAME \
-    DB_HOST \
-    DB_PORT \
-    DB_USER \
-    DB_PASSWORD \
-    DB_VERSION \
-    DB_CHARSET \
-    MAILER_DSN \
-    CORS_ALLOW_ORIGIN \
-    MERCURE_URL \
-    MERCURE_PUBLIC_URL \
-    MERCURE_JWT_SECRET \
-    JWT_PASSPHRASE \
-    STRIPE_PK \
-    STRIPE_SK \
-    STRIPE_WH_SK \
-    FRONT_URL \
-    KYC_API_URL \
-    KYC_API_SECRET \
-    CURL_ENV=prod \
-
-ENV TRUSTED_PROXIES=$TRUSTED_PROXIES \
-    TRUSTED_HOSTS=$TRUSTED_HOSTS \
-    APP_ENV=$APP_ENV \
-    APP_SECRET=$APP_SECRET \
-    DB_NAME=$DB_NAME \
-    DB_HOST=$DB_HOST \
-    DB_PORT=$DB_PORT \
-    DB_USER=$DB_USER \
-    DB_PASSWORD=$DB_PASSWORD \
-    DB_VERSION=$DB_VERSION \
-    DB_CHARSET=$DB_CHARSET \
-    MAILER_DSN=$MAILER_DSN \
-    CORS_ALLOW_ORIGIN=$CORS_ALLOW_ORIGIN \
-    MERCURE_URL=$MERCURE_URL \
-    MERCURE_PUBLIC_URL=$MERCURE_PUBLIC_URL \
-    MERCURE_JWT_SECRET=$MERCURE_JWT_SECRET \
-    JWT_PASSPHRASE=$JWT_PASSPHRASE \
-    STRIPE_PK=$STRIPE_PK \
-    STRIPE_SK=$STRIPE_SK \
-    STRIPE_WH_SK=$STRIPE_WH_SK \
-    FRONT_URL=$FRONT_URL \
-    KYC_API_URL=$KYC_API_URL \
-    KYC_API_SECRET=$KYC_API_SECRET \
-    CURL_ENV=$CURL_ENV
-
-COPY docker/create-dot-env.sh . 
-RUN chmod +x create-dot-env.sh; \
-	./create-dot-env.sh; \
-	rm create-dot-env.sh;
 
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
