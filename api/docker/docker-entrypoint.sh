@@ -48,7 +48,7 @@ if grep -q DB_HOST= .env; then
 			echo "Executing migrations..."
 			php bin/console doctrine:migrations:migrate --no-interaction --quiet
 		fi
-		if [ "$APP_ENV" != 'test' ]; then
+		if [ "$APP_ENV" = 'test' ]; then
 			echo "Executing fixtures..."
 			php bin/console d:f:l --no-interaction --quiet
 		fi

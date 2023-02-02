@@ -31,6 +31,10 @@ class PaymentController extends AbstractController
         $body = json_decode($request->getContent(), true);
 
         $user = $this->getUser();
+        if($user->getIsVerified() === false){
+            return $this->json(['error' => 'You must verify your account before creating a project'], 400);
+        }
+
         if(!$user->getStripeId()){
             $customer = $this->stripeClient->customers->create([
                 'email' => $user->getEmail(),
@@ -112,6 +116,12 @@ class PaymentController extends AbstractController
             return $this->json(['message' => 'Unknow subscription plan'], 500);
         }
         $user = $this->getUser();
+        if($user->getIsVerified() === false){
+            return $this->json(['error' => 'You must verify your account before having a subscription'], 400);
+        }
+        if($user->getFreelancerInfo()->getIsVerified() === false){
+            return $this->json(['error' => 'You must verify your freelancer status before having a subscription'], 400);
+        }
 
         if(!$user->getStripeId()){
             $customer = $this->stripeClient->customers->create([

@@ -45,10 +45,8 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
             'Content-Length: ' . strlen($body_string))                                                                       
         );
         
-        $result = curl_exec($ch);
-        $httpReturnCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        dump($baseUrl, $body_string, $ch, $result, $httpReturnCode);
+        curl_exec($ch);
+        curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         return $user->getFreelancerInfo();
     }
