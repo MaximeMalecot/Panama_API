@@ -2,11 +2,11 @@
 
 namespace App\State;
 
-use App\Entity\User;
 use App\Dto\FreelancerInfoKYCDto;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
+use App\Entity\FreelancerInfo;
 use Symfony\Component\Security\Core\Security;
 
 final class FreelancerInfoKYCProcessor implements ProcessorInterface
@@ -14,7 +14,7 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
 
     public function __construct(private FreelancerInfoKYCDto $dto, private EntityManagerInterface $em, private Security $security){}
 
-    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = []): ?FreelancerInfo
     {
         if (!$data instanceof FreelancerInfoKYCDto) {
             return null;
@@ -25,7 +25,7 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
             return null;
         }
         
-        $baseUrl = (isset($_ENV['CURL_ENV']) && $_ENV['CURL_ENV'] === "prod" ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
+        $baseUrl = (isset($_ENV['CURL_ENV']) && $_ENV['CURL_ENV'] === "prod" ? "https" : "http") . "://" . (isset($_ENV['HOST']) ? $_ENV['HOST'] : $_SERVER['HTTP_HOST']);
 
         $uri = array(
             "success_uri" => $baseUrl."/webhook/kyc_verification/{$user->getId()}?status=success",
@@ -50,7 +50,7 @@ final class FreelancerInfoKYCProcessor implements ProcessorInterface
 
         dump($baseUrl, $body_string, $ch, $result, $httpReturnCode);
 
-        return null;
+        return $user->getFreelancerInfo();
     }
 
 

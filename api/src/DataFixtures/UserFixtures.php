@@ -3,17 +3,13 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
-use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Faker\Factory;
 
 class UserFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $faker = Factory::create();
         
         $pwd = '$2y$13$ysK58wrGjIQyag8ZN31pzeVRMUmWga5wTNav7kgyts0gKCUGegSa.';
         $object=(new User)
@@ -21,7 +17,7 @@ class UserFixtures extends Fixture
             ->setSurname('user')
             ->setEmail("user@user.com")
             ->setPassword($pwd)
-            ->setCreatedAt($faker->dateTimeBetween('-1 year', '-1 day'))
+            ->setIsVerified(true)
             ;
         $manager->persist($object);
 
@@ -31,7 +27,7 @@ class UserFixtures extends Fixture
             ->setEmail("freelance@freelance.com")
             ->setPassword($pwd)
             ->setRoles(["ROLE_FREELANCER"])
-            ->setCreatedAt($faker->dateTimeBetween('-1 year', '-1 day'))
+            ->setIsVerified(true)
             ;
         $manager->persist($object);
         
@@ -41,7 +37,7 @@ class UserFixtures extends Fixture
             ->setEmail("freelanceprem@freelanceprem.com")
             ->setPassword($pwd)
             ->setRoles(["ROLE_FREELANCER_PREMIUM"])
-            ->setCreatedAt($faker->dateTimeBetween('-1 year', '-1 day'))
+            ->setIsVerified(true)
             ;
         $manager->persist($object);
 
@@ -52,7 +48,7 @@ class UserFixtures extends Fixture
             ->setEmail("client@client.com")
             ->setPassword($pwd)
             ->setRoles(["ROLE_CLIENT"])
-            ->setCreatedAt($faker->dateTimeBetween('-1 year', '-1 day'))
+            ->setIsVerified(true)
             ;
         $manager->persist($object);;
 
@@ -62,7 +58,7 @@ class UserFixtures extends Fixture
             ->setEmail("admin@admin.com")
             ->setPassword($pwd)
             ->setRoles(["ROLE_ADMIN"])
-            ->setCreatedAt($faker->dateTimeBetween('-1 year', '-1 day'))
+            ->setIsVerified(true)
         ;
         $manager->persist($object);
 

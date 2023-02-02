@@ -2,9 +2,10 @@
 
 namespace App\Security\Voter;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use App\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class FreelancerInfoVoter extends Voter
 {
@@ -12,8 +13,6 @@ class FreelancerInfoVoter extends Voter
 
     protected function supports(string $attribute, $subject): bool
     {
-        // replace with your own logic
-        // https://symfony.com/doc/current/security/voters.html
         return in_array($attribute, [self::FREELANCER_VERIFY]);
     }
 
@@ -28,10 +27,23 @@ class FreelancerInfoVoter extends Voter
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case self::FREELANCER_VERIFY:
-                return in_array('ROLE_FREELANCER', $user->getRoles()) && !$user->getFreelancerInfo()->getIsVerified();
+                return $this->canVerifyFreelancer($user);
                 break;
         }
 
         return false;
+    }
+
+
+    private function canVerifyFreelancer(User $user): bool
+    {
+        if( !$user->getIsVerified() || !in_array('ROLE_FREELANCER', $user->getRoles())){
+            return false;
+        }
+        $subject = $user->getFreelancerInfo();
+        if($subject->getIsVerified() || is_null($subject->getPhoneNb()) || is_null($subject->getAddress()) || is_null($subject->getCity())){
+            return false;
+        }
+        return true;
     }
 }

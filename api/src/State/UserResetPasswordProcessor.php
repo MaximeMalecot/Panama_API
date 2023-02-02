@@ -34,9 +34,7 @@ final class UserResetPasswordProcessor implements ProcessorInterface
             $this->em->flush();
             return $user;
         }
-        else{
-            return null;
-        }
+        return null;
     }
 
 

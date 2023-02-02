@@ -1,4 +1,8 @@
 #!/bin/sh
+set -e
+
+setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var
+setfacl -dR -m u:www-data:rwX -m u:"$(whoami)":rwX var
 
 PHP_INI_RECOMMENDED="$PHP_INI_DIR/php.ini-production"
 if [ "$APP_ENV" != 'prod' ]; then
@@ -13,9 +17,6 @@ else
 	echo "Warming up cache..."
 	php bin/console cache:clear --no-interaction --quiet
 fi
-
-setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var
-setfacl -dR -m u:www-data:rwX -m u:"$(whoami)":rwX var
 
 if [ ! -d "./config/jwt" ]; then
 	echo "Generating jwt keys..."
@@ -47,7 +48,7 @@ if grep -q DB_HOST= .env; then
 			echo "Executing migrations..."
 			php bin/console doctrine:migrations:migrate --no-interaction --quiet
 		fi
-		if [ "$APP_ENV" != 'prod' ]; then
+		if [ "$APP_ENV" != 'test' ]; then
 			echo "Executing fixtures..."
 			php bin/console d:f:l --no-interaction --quiet
 		fi

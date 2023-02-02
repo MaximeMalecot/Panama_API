@@ -5,9 +5,18 @@ services:
   php:
     volumes:
       - ./api:/var/www:rw,cached
+      - /var/www/var
+      - /var/www/vendor
     environment:
       APP_ENV: dev
-      FRONT_URL: http://kyc:3000/check
+      KYC_API_URL: http://kyc:3000/check
+      HOST: php
+  
+###> symfony/mailer ###
+  mailer:
+    image: schickling/mailcatcher
+    ports: ["1025", "1080"]
+###< symfony/mailer ###
       
   database:
     ports:

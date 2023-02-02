@@ -68,13 +68,15 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     uriTemplate: '/users/update_password', 
     input: UserResetPasswordDto::class,
     output: User::class,
-    processor: UserResetPasswordProcessor::class
+    processor: UserResetPasswordProcessor::class,
+    status: 204
 )]
 #[Patch(
     uriTemplate: '/users/verify_email',
     input: UserVerifyEmailDto::class,
     output: User::class,
-    processor: UserVerifyEmailProcessor::class
+    processor: UserVerifyEmailProcessor::class,
+    status: 204
 )]
 
 #[Put(

@@ -51,9 +51,8 @@ class RegisterController extends AbstractController
 
         $this->em->persist($user);
         $this->em->flush();
-
-        // SEND EMAIL WITH LINK AND TOKEN
-
-        return $this->json("Created", 201);
+        return $this->json([
+            "profile" => $profile
+        ], 201);
     }
 }

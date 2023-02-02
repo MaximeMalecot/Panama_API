@@ -43,7 +43,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     uriTemplate: '/freelancer_infos/kyc', 
     input: FreelancerInfoKYCDto::class, 
     processor: FreelancerInfoKYCProcessor::class,
-    status: 204
+    status: 202
 )]
 #[ORM\Entity(repositoryClass: FreelancerInfoRepository::class)]
 class FreelancerInfo
