@@ -10,7 +10,6 @@ class UserFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        
         $pwd = '$2y$13$ysK58wrGjIQyag8ZN31pzeVRMUmWga5wTNav7kgyts0gKCUGegSa.';
         $object=(new User)
             ->setName('user')

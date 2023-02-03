@@ -12,18 +12,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
 #[Get(
-    security: "is_granted('ROLE_ADMIN')",
+    security: "is_granted('ROLE_ADMIN') or object.getClient() == user",
     normalizationContext: [
-        'groups' => ["clientInfo_get"]
+        'groups' => ["client_info_get"]
     ],
 )]
 #[Patch(
     security: "is_granted('ROLE_ADMIN') or object.getClient() === user",
     normalizationContext: [
-        'groups' => ["clientInfo_get"]
+        'groups' => ["client_info_get"]
     ],
     denormalizationContext: [
-        'groups' => ["clientInfo_patch"]
+        'groups' => ["client_info_patch"]
     ]
 )]
 #[ORM\Entity(repositoryClass: ClientInfoRepository::class)]
@@ -32,27 +32,28 @@ class ClientInfo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["clientInfo_get", "specific_client_get"])]
+    #[Groups(["client_info_get", "specific_client_get", "user_register"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["clientInfo_get", "clientInfo_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", "user_register"])]
     private ?string $address = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["clientInfo_get", "clientInfo_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", "user_register"])]
     private ?string $city = null;
 
     #[ORM\Column(length: 12, nullable: true)]
-    #[Groups(["clientInfo_get", "clientInfo_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", "user_register"])]
     private ?string $phoneNb = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["clientInfo_get", "clientInfo_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", "user_register"])]
     private ?string $description = null;
 
     #[ORM\OneToOne(inversedBy: 'clientInfo', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
     private ?User $client = null;
 
     public function getId(): ?int

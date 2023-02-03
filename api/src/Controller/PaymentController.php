@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use Stripe\Webhook;
 use App\Entity\Invoice;
 use App\Entity\Project;
 use Stripe\StripeClient;
@@ -12,7 +11,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\SubscriptionPlanRepository;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/payment')]
@@ -33,6 +31,10 @@ class PaymentController extends AbstractController
         $user = $this->getUser();
         if($user->getIsVerified() === false){
             return $this->json(['error' => 'You must verify your account before creating a project'], 400);
+        }
+        $clientInfos = $user->getClientInfos();	
+        if(!$clientInfos->getPhoneNb() || !$clientInfos->getAddress() || !$clientInfos->getCity()){
+            return $this->json(['error' => 'You must specify your phone number, address and city before creating a project'], 400);
         }
 
         if(!$user->getStripeId()){
@@ -131,15 +133,17 @@ class PaymentController extends AbstractController
             $user->setStripeId($customer->id);
         }
 
-        if($user->getSubscription()->getIsActive() === true){
-            return $this->json(['message' => 'You already have a subscription'], 500);
-        }else if ($user->getSubscription()->getIsActive() === false){
-            $subscription = $user->getSubscription();
-            $subscription->setPlan($subscriptionPlan);
+        if($user->getSubscription()){
+            if($user->getSubscription()->getIsActive() === true){
+                return $this->json(['message' => 'You already have a subscription'], 500);
+            } else{
+                $subscription = $user->getSubscription();
+                $subscription->setPlan($subscriptionPlan);
+            }
         }else{
             $subscription = (new Subscription())
                 ->setPlan($subscriptionPlan)
-                ->setFreelancer($this->getUser())
+                ->setFreelancer($user)
             ;
         }
 

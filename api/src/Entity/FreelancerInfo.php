@@ -51,27 +51,27 @@ class FreelancerInfo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget", "specific_freelancer_get"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget", "specific_freelancer_get", "user_register"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget", "user_register"])]
     private ?bool $isVerified = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch", "user_register"])]
     private ?string $description = null;
 
     #[ORM\Column(length: 12, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch", "user_register"])]
     private ?string $phoneNb = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch", "user_register"])]
     private ?string $address = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch", "user_register"])]
     private ?string $city = null;
 
     #[ORM\OneToOne(inversedBy: 'freelancerInfo', cascade: ['persist', 'remove'])]

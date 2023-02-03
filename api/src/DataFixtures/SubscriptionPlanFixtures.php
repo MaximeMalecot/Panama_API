@@ -6,7 +6,6 @@ use Faker\Factory;
 use App\Entity\SubscriptionPlan;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 class SubscriptionPlanFixtures extends Fixture
 {

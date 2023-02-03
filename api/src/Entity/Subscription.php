@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
@@ -10,6 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
 use App\Repository\SubscriptionRepository;
 use Doctrine\Common\Collections\Collection;
+use App\Controller\CancelSubscriptionController;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -25,6 +27,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: [
         'groups' => ['subscription_cget']
     ]
+)]
+#[Put(
+    uriTemplate: '/subscriptions/own',
+    controller: CancelSubscriptionController::class,
+    security: "is_granted('CAN_CANCEL_SUBSCRIPTION')"
 )]
 #[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
 class Subscription

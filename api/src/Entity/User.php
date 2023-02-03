@@ -78,7 +78,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     processor: UserVerifyEmailProcessor::class,
     status: 204
 )]
-
 #[Put(
     security: "is_granted('ROLE_ADMIN') or object.getOwner() == user",
     denormalizationContext: [
@@ -95,7 +94,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         'groups' => ['user_write_register']
     ],
     normalizationContext: [
-        'groups' => ['user_get']
+        'groups' => ['user_register']
     ]
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -108,18 +107,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
     #[NotBlank()]
     #[NotNull()]
     #[Email()]
-    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request",  "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get"])]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(["user_write_register"])]
+    #[Groups(["user_write_register", "user_get", "user_register", "client_info_get"])]
     private array $roles = [];
 
     /**
@@ -139,18 +138,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $resetPwdToken = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_write_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions"])]
+    #[Groups(["user_get", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_write_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions"])]
+    #[Groups(["user_get", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
     private ?bool $isVerified = false;
 
     #[ORM\OneToOne(mappedBy: 'client', cascade: ['persist', 'remove'])]
-    #[Groups(["user_get", "specific_client_get"])]
+    #[Groups(["user_get", "user_register", "specific_client_get"])]
     private ?ClientInfo $clientInfo = null;
 
     #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
