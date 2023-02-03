@@ -30,6 +30,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ApiResource]
 #[Get(
+    security: 'is_granted("ROLE_ADMIN") or object == user',
     normalizationContext: [
         'groups' => ['user_get']
     ]
@@ -46,6 +47,15 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     uriTemplate: '/users/freelancer/{id}',
     normalizationContext: [
         'groups' => ['user_get', 'specific_freelancer_get']
+    ]
+)]
+#[Put(
+    security: "is_granted('ROLE_ADMIN') or object.getOwner() == user",
+    denormalizationContext: [
+        'groups' => ['user_modify']
+    ],
+    normalizationContext: [
+        'groups' => ['user_get']
     ]
 )]
 #[GetCollection(
@@ -77,15 +87,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     output: User::class,
     processor: UserVerifyEmailProcessor::class,
     status: 204
-)]
-#[Put(
-    security: "is_granted('ROLE_ADMIN') or object.getOwner() == user",
-    denormalizationContext: [
-        'groups' => ['user_modify']
-    ],
-    normalizationContext: [
-        'groups' => ['user_get']
-    ]
 )]
 #[Post(
     uriTemplate: '/register', 
@@ -146,6 +147,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    #[Groups(["user_get"])]
     private ?bool $isVerified = false;
 
     #[ORM\OneToOne(mappedBy: 'client', cascade: ['persist', 'remove'])]

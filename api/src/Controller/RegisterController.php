@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 
 #[AsController]
 class RegisterController extends AbstractController
@@ -16,7 +19,7 @@ class RegisterController extends AbstractController
 
     public function __construct(private RequestStack $requestStack, private EntityManagerInterface $em, private UserPasswordHasherInterface $encoder){}
 
-    public function __invoke()
+    public function __invoke(MailerInterface $mailer,)
     {
         $name = json_decode($this->requestStack->getCurrentRequest()->getContent())->name;
         $surname = json_decode($this->requestStack->getCurrentRequest()->getContent())->surname;
@@ -48,6 +51,16 @@ class RegisterController extends AbstractController
             $profile = (new FreelancerInfo())->setFreelancer($user);
             $this->em->persist($profile);
         }
+
+        $emailconfig = (new TemplatedEmail())
+            ->from(new Address('panama@easylocmoto.fr','Panama Agency'))
+            ->to($email)
+            ->subject('Verify your account')
+            ->htmlTemplate('mail/Verify-account.html.twig')
+            ->context(['name'=> $user->getName(). " ".$user->getSurname(),
+                        'token' => $user->getVerifyEmailToken()]);
+        $mailer->send($emailconfig);
+
 
         $this->em->persist($user);
         $this->em->flush();

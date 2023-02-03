@@ -25,9 +25,7 @@ class SubscriptionVoter extends Voter
         if (!$user instanceof UserInterface) {
             return false;
         }
-        dump(in_array("ROLE_FREELANCER_PREMIUM", $user->getRoles()), $user->getSubscription()->getIsActive() === true );
-
-        // ... (check conditions and return true to grant permission) ...
+        
         switch ($attribute) {
             case self::CAN_CANCEL_SUBSCRIPTION:
                 return in_array("ROLE_FREELANCER_PREMIUM", $user->getRoles()) && $user->getSubscription()->getIsActive() === true ;

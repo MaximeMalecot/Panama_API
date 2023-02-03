@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[Put(
-    uriTemplate: '/subscriptions/own',
+    uriTemplate: '/subscriptions/cancel',
     controller: CancelSubscriptionController::class,
     security: "is_granted('CAN_CANCEL_SUBSCRIPTION')"
 )]

@@ -1,14 +1,12 @@
 <?php
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use phpDocumentor\Reflection\Types\Context;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 
@@ -18,7 +16,7 @@ class ResetPasswordController extends AbstractController
 
     public function __construct(private RequestStack $requestStack, private EntityManagerInterface $em){}
 
-    public function __invoke(MailerInterface $mailer,UserRepository $userRepository)
+    public function __invoke(MailerInterface $mailer, UserRepository $userRepository)
     {
         $email = json_decode($this->requestStack->getCurrentRequest()->getContent())->email;
 
@@ -35,7 +33,7 @@ class ResetPasswordController extends AbstractController
             ->to($email)
             ->subject('Reset Your Password')
             ->htmlTemplate('mail/Reset-password.html.twig')
-            ->context(['name'=> $user->getSurname(),
+            ->context(['name'=> $user->getName(). " ".$user->getSurname(),
                         'token' => $user->getResetPwdToken()]);
         $mailer->send($emailconfig);
 

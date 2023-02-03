@@ -46,7 +46,7 @@ To use the Stripe webhooks without hosting the application, you might need to in
 
 Once the settings are done, use the following command in your shell
 
-stripe listen --skip-verify --forward-to https://localhost/webhook/stripe
+stripe listen --skip-verify --forward-to http://localhost/webhook/stripe
 
 ## Deployement
 
