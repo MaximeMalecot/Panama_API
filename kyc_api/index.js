@@ -31,6 +31,7 @@ app.post("/check", async (req, res) => {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `${process.env.API_SECRET}`,
+                    Host: `${process.env.API_HOST}`,
                 },
             });
             console.log("Request finished");
