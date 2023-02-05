@@ -24,7 +24,7 @@ final class UserVerifyEmailProcessor implements ProcessorInterface
         }
         $user = $this->em->getRepository(User::class)->findOneBy(['verifyEmailToken' => $data->token]);
         if(!$user){
-            throw new NotFoundHttpException('User not found');
+            throw new NotFoundHttpException('User not found or token already used');
         }
         $user->setIsVerified(true);
         $user->setVerifyEmailToken(null);

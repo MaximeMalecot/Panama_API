@@ -32,7 +32,7 @@ class PaymentController extends AbstractController
         if($user->getIsVerified() === false){
             return $this->json(['error' => 'You must verify your account before creating a project'], 400);
         }
-        $clientInfos = $user->getClientInfos();	
+        $clientInfos = $user->getClientInfo();	
         if(!$clientInfos->getPhoneNb() || !$clientInfos->getAddress() || !$clientInfos->getCity()){
             return $this->json(['error' => 'You must specify your phone number, address and city before creating a project'], 400);
         }

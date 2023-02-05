@@ -74,7 +74,7 @@ class Project
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
-    #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects')]
+    #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects', cascade: ['persist', 'remove'])]
     #[Groups(["project_get", "project_cget", "project_get_own", "project_get_propositions"])]
     private Collection $filters;
 

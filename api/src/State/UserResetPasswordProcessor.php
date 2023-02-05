@@ -24,7 +24,7 @@ final class UserResetPasswordProcessor implements ProcessorInterface
         }
         $user = $this->em->getRepository(User::class)->findOneBy(['resetPwdToken' => $data->token]);
         if(!$user){
-            throw new NotFoundHttpException('User not found');
+            throw new NotFoundHttpException('User not found or token already used');
         }
         $now = new \DateTime();
         if ( $now->format("U")-$user->getResetPwdTokenTime()->format("U")<3600 )
