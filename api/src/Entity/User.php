@@ -155,7 +155,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?ClientInfo $clientInfo = null;
 
     #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
-    #[Groups(["user_get", "specific_freelancer_get"])]
+    #[Groups(["user_get", "user_register", "specific_freelancer_get"])]
     private ?FreelancerInfo $freelancerInfo = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Project::class, orphanRemoval: true)]

@@ -19,7 +19,7 @@ class RegisterController extends AbstractController
 
     public function __construct(private RequestStack $requestStack, private EntityManagerInterface $em, private UserPasswordHasherInterface $encoder){}
 
-    public function __invoke(MailerInterface $mailer,)
+    public function __invoke(MailerInterface $mailer)
     {
         $name = json_decode($this->requestStack->getCurrentRequest()->getContent())->name;
         $surname = json_decode($this->requestStack->getCurrentRequest()->getContent())->surname;
@@ -64,8 +64,6 @@ class RegisterController extends AbstractController
 
         $this->em->persist($user);
         $this->em->flush();
-        return $this->json([
-            "profile" => $profile
-        ], 201);
+        return $user;
     }
 }
