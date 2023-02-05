@@ -1,9 +1,6 @@
 #!/bin/sh
 set -e
 
-setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var
-setfacl -dR -m u:www-data:rwX -m u:"$(whoami)":rwX var
-
 PHP_INI_RECOMMENDED="$PHP_INI_DIR/php.ini-production"
 if [ "$APP_ENV" != 'prod' ]; then
 	PHP_INI_RECOMMENDED="$PHP_INI_DIR/php.ini-development"

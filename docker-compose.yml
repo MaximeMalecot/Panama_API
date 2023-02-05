@@ -7,8 +7,6 @@ services:
       dockerfile: local.Dockerfile
     depends_on:
       - database
-    volumes:
-      - php_socket:/var/run/php
     ports:
       - 80:80
     healthcheck:
@@ -61,5 +59,4 @@ networks:
   dbadmin:
 
 volumes:
-  php_socket:
   db_challenge_data:
