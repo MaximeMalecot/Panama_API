@@ -11,6 +11,7 @@ services:
       APP_ENV: dev
       KYC_API_URL: http://kyc:3000/check
       HOST: php
+      MAILER_URL: smtp://mailcatcher:1025
   
 ###> symfony/mailer ###
   mailer:
