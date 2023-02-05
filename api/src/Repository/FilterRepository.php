@@ -40,27 +40,6 @@ class FilterRepository extends ServiceEntityRepository
         }
     }
 
-    public function findAllByCriteria($values)
-    {
-        $qb = $this->createQueryBuilder('f');
-        $compteur = 0;
-        foreach ($values as $value){
-            if($compteur == 0)
-            {
-                $qb->Where("f.name = :name$compteur");
-                $qb->setParameter("name$compteur",$value);
-                $compteur++;
-            }
-            else{
-                $qb->orWhere("f.name = :name$compteur");
-                $qb->setParameter("name$compteur",$value);
-                $compteur++;
-            }
-
-        }
-        return $qb->getQuery()->execute();
-    }
-
 //    /**
 //     * @return Filter[] Returns an array of Filter objects
 //     */
