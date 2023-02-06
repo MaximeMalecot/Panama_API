@@ -80,11 +80,11 @@ class Project
     private ?Invoice $invoice = null;
 
     #[ORM\Column]
-    #[Groups(["project_get", "project_get_propositions", "proposition_cget", "user_get_projects"])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
     private ?int $minPrice = null;
 
     #[ORM\Column]
-    #[Groups(["project_get", "project_get_propositions", "proposition_cget", "user_get_projects"])]
+    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
     private ?int $maxPrice = null;
 
     #[ORM\Column(length: 255, options: ['default' => 'CREATED'])]
@@ -92,7 +92,7 @@ class Project
     private ?string $status = "CREATED";
 
     #[ORM\Column]
-    #[Groups(["project_get", "project_get_propositions", "proposition_cget", "user_get_projects"])]
+    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
     private ?int $length = null;
     
     #[ORM\Column(length: 128, unique: true)]
