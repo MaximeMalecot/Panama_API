@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\Slug;
@@ -12,6 +13,7 @@ use App\Repository\ProjectRepository;
 use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\Collection;
+use App\Controller\PropositionPostController;
 use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -36,6 +38,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: [
         'groups' => ['project_cget']
     ]
+)]
+#[Post(
+    uriTemplate: "/projects/{id}/propositions",
+    controller: PropositionPostController::class,
+    security: "is_granted('ROLE_FREELANCER_PREMIUM') and object.getStatus() === 'ACTIVE'",
 )]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
@@ -88,7 +95,7 @@ class Project
     private ?int $maxPrice = null;
 
     #[ORM\Column(length: 255, options: ['default' => 'CREATED'])]
-    #[Groups(["project_get_own", "project_get_propositions", "user_get_projects"])]
+    #[Groups(["project_get_own", "project_get_propositions", "user_get_projects", "project_cget"])]
     private ?string $status = "CREATED";
 
     #[ORM\Column]

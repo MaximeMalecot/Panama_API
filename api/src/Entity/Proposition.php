@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
 use App\Repository\PropositionRepository;
+use App\Controller\PropositionPatchController;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
@@ -23,10 +25,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
         "groups" => ["proposition_cget"]
     ]
 )]
+#[Patch(
+    name: "proposition_accept_or_refuse",
+    uriTemplate: "/propositions/{id}/accept-or-refuse",
+    controller: PropositionPatchController::class,
+    security: "is_granted('MODIFY_PROPOSITION', object)",
+)]
 #[ORM\Entity(repositoryClass: PropositionRepository::class)]
 class Proposition
 {
     use TimestampableTrait;
+
+    public const STATUS = [
+        'AWAITING' => 'AWAITING',
+        'ACCEPTED' => 'ACCEPTED',
+        'REFUSED' => 'REFUSED',
+    ];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -36,7 +50,7 @@ class Proposition
 
     #[ORM\Column(length: 255)]
     #[Groups(["project_get_propositions", "proposition_get", "proposition_cget"])]
-    private ?string $status = null;
+    private ?string $status = 'AWAITING';
 
     #[ORM\ManyToOne(inversedBy: "propositions")]
     #[Groups(["proposition_get", "proposition_cget"])]
@@ -59,7 +73,8 @@ class Proposition
 
     public function setStatus(string $status): self
     {
-        $this->status = $status;
+        if( in_array($status, self::STATUS) )
+            $this->status = $status;
 
         return $this;
     }
