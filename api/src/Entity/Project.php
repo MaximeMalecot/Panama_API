@@ -19,9 +19,9 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
-#[ApiFilter(SearchFilter::class, properties: ['name' => 'exact', 'status' => 'exact', 'filters.name' => 'exact' ])]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'partial', 'status' => 'exact', 'filters.name' => 'exact' ])]
 #[Get(
-    security: "is_granted('ROLE_FREELANCER')",
+    security: "is_granted('ROLE_FREELANCER') or object.getOwner() === user",
     normalizationContext: [
         'groups' => ['project_get']
     ]
