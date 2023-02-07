@@ -53,7 +53,7 @@ class ClientInfo
 
     #[ORM\OneToOne(inversedBy: 'clientInfo', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch"])]
     private ?User $client = null;
 
     public function getId(): ?int

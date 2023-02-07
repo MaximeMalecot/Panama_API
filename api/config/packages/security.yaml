@@ -30,13 +30,15 @@ security:
             jwt: ~
 
     access_control:
-        - { path: ^/authentication_token, roles: PUBLIC_ACCESS }
         - { path: ^/payment/create_checkout, roles: ROLE_CLIENT }
         - { path: ^/payment/create_subscription, roles: ROLE_FREELANCER }
-        - { path: ^/users/verify_email, roles: PUBLIC_ACCESS }
-        - { path: ^/users/update_password, roles: PUBLIC_ACCESS }
         - { path: ^/users/forgot_password, roles: PUBLIC_ACCESS }
+        - { path: ^/users/update_password, roles: PUBLIC_ACCESS }
+        - { path: ^/users/verify_email, roles: PUBLIC_ACCESS }
+        - { path: ^/authentication_token, roles: PUBLIC_ACCESS }
+        - { path: ^/projects, roles: PUBLIC_ACCESS}
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/users, roles: PUBLIC_ACCESS}
         - { path: ^/webhook, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 

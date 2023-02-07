@@ -56,6 +56,19 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         'groups' => ['user_get', 'specific_freelancer_get']
     ]
 )]
+#[Get(
+    security: 'is_granted("ROLE_ADMIN") or object == user',
+    uriTemplate: '/users/{id}/reviews',
+    normalizationContext: [
+        'groups' => ['user_get', 'user_get_reviews']
+    ]
+)]
+#[GetCollection(
+    security: "is_granted('ROLE_ADMIN')",
+    normalizationContext: [
+        'groups' => ['user_cget']
+    ]
+)]
 #[Put(
     security: "is_granted('ROLE_ADMIN') or object == user",
     denormalizationContext: [
@@ -63,11 +76,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     ],
     normalizationContext: [
         'groups' => ['user_get']
-    ]
-)]
-#[GetCollection(
-    normalizationContext: [
-        'groups' => ['user_cget']
     ]
 )]
 #[Patch(
@@ -193,12 +201,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $reset_pwd_token_time = null;
 
+
+    #[ORM\OneToMany(mappedBy: 'freelancer', targetEntity: Review::class, orphanRemoval: true)]
+    private Collection $reviews;
+
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Review::class, orphanRemoval: true)]
+    #[Groups(["user_get_reviews"])]
+    private Collection $createdReviews;
+
     public function __construct()
     {
         $this->createdProjects = new ArrayCollection();
         $this->propositions = new ArrayCollection();
         $this->invoices = new ArrayCollection();
         $this->socialLinks = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
+        $this->createdReviews = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -562,6 +580,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setResetPwdTokenTime(?\DateTimeInterface $reset_pwd_token_time): self
     {
         $this->reset_pwd_token_time = $reset_pwd_token_time;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getCreatedReviews(): Collection
+    {
+        return $this->createdReviews;
+    }
+
+    public function addCreatedReview(Review $review): self
+    {
+        if (!$this->createdReviews->contains($review)) {
+            $this->createdReviews[] = $review;
+            $review->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedReview(Review $review): self
+    {
+        if ($this->createdReviews->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getClient() === $this) {
+                $review->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): self
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews[] = $review;
+            $review->setFreelancer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): self
+    {
+        if ($this->reviews->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getFreelancer() === $this) {
+                $review->setFreelancer(null);
+            }
+        }
+
         return $this;
     }
 }

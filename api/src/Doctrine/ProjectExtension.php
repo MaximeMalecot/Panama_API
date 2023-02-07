@@ -35,30 +35,27 @@ final class ProjectExtension implements QueryCollectionExtensionInterface
                 $queryBuilder->orWhere(sprintf('%s.owner = :current_user', $rootAlias));
                 $queryBuilder->setParameters([
                     'current_user' => $user,
-                    'status' => 'ACTIVE'
+                    'status' => array('ACTIVE', 'ENDED')
                 ]);
-            } else if($this->security->isGranted('ROLE_FREELANCER')) {
+            } else if($this->security->isGranted('ROLE_FREELANCER_PREMIUM')) {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
-                $queryBuilder->andWhere(sprintf('%s.status = :status', $rootAlias));
-                $queryBuilder->innerJoin(sprintf('%s.propositions', $rootAlias), 'p')
-                    ->orWhere($queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->eq('p.freelancer', ':current_user'),
-                        $queryBuilder->expr()->eq('p.status', ':proposition_status')
-                    ));
+                $queryBuilder->leftJoin(sprintf('%s.propositions', $rootAlias), 'p');
+                $queryBuilder->andWhere(sprintf('%s.status IN (:status)', $rootAlias));
+                $queryBuilder->orWhere("p.freelancer = :current_user AND p.status = :proposition_status");
                 $queryBuilder->setParameters([
+                    'status' => array('ACTIVE', 'ENDED'),
                     'current_user' => $user,
-                    'proposition_status' => 'ACCEPTED',
-                    'status' => 'ACTIVE'
+                    'proposition_status' => 'ACCEPTED'
                 ]);
             } else {
                 $rootAlias = $queryBuilder->getRootAliases()[0];
-                $queryBuilder->andWhere(sprintf('%s.status = :status', $rootAlias));
-                $queryBuilder->setParameter('status', $status);
+                $queryBuilder->andWhere(sprintf('%s.status in (:status)', $rootAlias));
+                $queryBuilder->setParameter('status', array('ACTIVE', 'ENDED'));
             }
         } else {
             $rootAlias = $queryBuilder->getRootAliases()[0];
-            $queryBuilder->andWhere(sprintf('%s.status = :status', $rootAlias));
-            $queryBuilder->setParameter('status', 'ACTIVE');
+            $queryBuilder->andWhere(sprintf('%s.status in (:status)', $rootAlias));
+            $queryBuilder->setParameter('status', array('ACTIVE', 'ENDED'));
         }
     }
 }

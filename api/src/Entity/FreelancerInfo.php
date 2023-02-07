@@ -79,9 +79,6 @@ class FreelancerInfo
     #[Groups(["freelancer_info_get", "freelancer_info_cget"])]
     private ?User $freelancer = null;
 
-    #[ORM\OneToMany(mappedBy: 'freelancer', targetEntity: Review::class, orphanRemoval: true)]
-    private Collection $reviews;
-
     public function __construct()
     {
         $this->reviews = new ArrayCollection();
@@ -164,33 +161,4 @@ class FreelancerInfo
         return $this;
     }
 
-    /**
-     * @return Collection<int, Review>
-     */
-    public function getReviews(): Collection
-    {
-        return $this->reviews;
-    }
-
-    public function addReview(Review $review): self
-    {
-        if (!$this->reviews->contains($review)) {
-            $this->reviews[] = $review;
-            $review->setFreelancer($this);
-        }
-
-        return $this;
-    }
-
-    public function removeReview(Review $review): self
-    {
-        if ($this->reviews->removeElement($review)) {
-            // set the owning side to null (unless already changed)
-            if ($review->getFreelancer() === $this) {
-                $review->setFreelancer(null);
-            }
-        }
-
-        return $this;
-    }
 }

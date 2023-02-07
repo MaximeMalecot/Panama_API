@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ReviewRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use App\Controller\ReviewPostController;
 use App\Entity\Traits\TimestampableTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -26,12 +27,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[Post(
     security: "is_granted('ROLE_CLIENT')",
+    controller: ReviewPostController::class,
     normalizationContext: [
         'groups' => ['review_get']
     ],
-    denormalizationContext: [
-        'groups' => ['review_post']
-    ]
 )]
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
 class Review
@@ -50,17 +49,22 @@ class Review
         max: 10,
         notInRangeMessage: 'The must must be a float between {{ min }} and {{ max }}',
     )]
-    #[Groups(["review_get", "review_cget", "review_post"])]
+    #[Groups(["review_get", "review_cget"])]
     private ?float $mark = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["review_get", "review_post"])]
+    #[Groups(["review_get"])]
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["review_post"])]
-    private ?FreelancerInfo $freelancer = null;
+    #[Groups(["review_get", "review_cget"])]
+    private ?User $freelancer = null;
+
+    #[ORM\ManyToOne(inversedBy: 'createdReviews')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["review_get", "review_cget"])]
+    private ?User $client = null;
 
     public function getId(): ?int
     {
@@ -91,14 +95,26 @@ class Review
         return $this;
     }
 
-    public function getFreelancer(): ?FreelancerInfo
+    public function getFreelancer(): ?User
     {
         return $this->freelancer;
     }
 
-    public function setFreelancer(?FreelancerInfo $freelancer): self
+    public function setFreelancer(?User $freelancer): self
     {
         $this->freelancer = $freelancer;
+
+        return $this;
+    }
+
+    public function getClient(): ?User
+    {
+        return $this->client;
+    }
+
+    public function setClient(?User $client): self
+    {
+        $this->client = $client;
 
         return $this;
     }

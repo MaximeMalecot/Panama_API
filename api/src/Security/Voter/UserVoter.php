@@ -7,7 +7,6 @@ use App\Entity\User;
 use DateTimeImmutable;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -17,7 +16,7 @@ class UserVoter extends Voter
     public const GET_CLIENT = 'GET_CLIENT';
     public const GET_FREELANCER = 'GET_FREELANCER';
 
-    public function __construct(private RequestStack $requestStack, private EntityManagerInterface $em, private ProjectRepository $projectRepository){}
+    public function __construct(private ProjectRepository $projectRepository){}
 
     protected function supports(string $attribute, $subject): bool
     {
