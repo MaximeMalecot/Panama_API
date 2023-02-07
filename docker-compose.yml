@@ -27,6 +27,8 @@ services:
     restart: always
     environment:
       - PORT=3000
+      - API_SECRET=!ChangeMe!
+      - API_HOST=localhost
     ports:
       - 3000:3000
     networks:
