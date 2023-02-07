@@ -38,6 +38,8 @@ security:
         - { path: ^/users/forgot_password, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/webhook, roles: PUBLIC_ACCESS }
+        - { path: ^/projects, roles: PUBLIC_ACCESS }
+        - { path: ^/filters, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
     role_hierarchy:
