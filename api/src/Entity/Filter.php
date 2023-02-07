@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[GetCollection(
-    security: "is_granted('ROLE_FREELANCER') or is_granted('ROLE_CLIENT')",
+    // security: "is_granted('ROLE_FREELANCER') or is_granted('ROLE_CLIENT')",
     normalizationContext: [
         'groups' => ['filter_cget']
     ]
