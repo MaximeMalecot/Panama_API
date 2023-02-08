@@ -38,6 +38,7 @@ security:
         - { path: ^/authentication_token, roles: PUBLIC_ACCESS }
         - { path: ^/filters, roles: PUBLIC_ACCESS }
         - { path: ^/projects, roles: PUBLIC_ACCESS}
+        - { path: ^/subscription_plans, roles: PUBLIC_ACCESS}
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/users, roles: PUBLIC_ACCESS}
         - { path: ^/webhook, roles: PUBLIC_ACCESS }
