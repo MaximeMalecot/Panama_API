@@ -10,9 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectManager;
-use Stripe\StripeClient;
-use App\Entity\SubscriptionPlan;
+use App\Service\SubscriptionPlanService;
 
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -26,11 +24,10 @@ class CreateSubscriptionPlanCommand extends Command
 {
 
     public function __construct(
-                                private EntityManagerInterface $manager
+                                private SubscriptionPlanService $subscriptionPlanService
     )
     {
         parent::__construct();
-        $this->stripeClient = new StripeClient($_ENV['STRIPE_SK']);
     }
 
     protected function configure(): void
@@ -57,27 +54,10 @@ class CreateSubscriptionPlanCommand extends Command
                 $price = 9.99*100;
             }
 
-            $product = $this->createProduct();
-            if(!$product){
-                throw new \Exception('An error occurred, could not create this product');
-            }
-
-            $striplePlan = $this->stripeClient->plans->create([
-                'amount' => intval($price),
-                'currency' => 'eur',
-                'interval' => 'month',
-                'product' => $product,
-            ]);
-    
-            if(!$striplePlan){
-                throw new \Exception('An error occurred, could not create this user');
-            }
-            
-            $plan = $this->savePlan($striplePlan->id, $price, $name);
+            $plan = $this->subscriptionPlanService->createSubscriptionPlan($name, $price);
             if(!$plan){
-                throw new \Exception('An error occurred, could not save this plan');
+                throw new \Exception('An error occurred, could not create this plan');
             }
-
             $io->success("Plan created!");
             return Command::SUCCESS;
 
@@ -86,33 +66,6 @@ class CreateSubscriptionPlanCommand extends Command
             return Command::FAILURE;       
         }
 
-    }
-
-    private function createProduct(): ?string
-    {
-        $product = $this->stripeClient->products->create([
-            'name' => 'Subscription',
-        ]);
-
-        if(!$product){
-            return false;
-        }
-
-        return $product->id;
-    }
-
-    private function savePlan(string $planId, int $price, string $name): bool
-    {
-        $plan = new SubscriptionPlan();
-        $plan->setName($name);
-        $plan->setDescription("Subscription plan");
-        $plan->setPrice($price);
-        $plan->setStripeId($planId);
-        $plan->setColor("#000000");
-        $this->manager->persist($plan);
-        $this->manager->flush();
-
-        return true;
     }
 
 }
