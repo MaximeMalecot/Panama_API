@@ -33,6 +33,15 @@ If you want to activate an account you can go to the following url : http://loca
 
 You'll see all emails that have been sent by the application.
 
+# Create Plan
+To create a plan linked to an actual Stripe plan, you can use the following command, however, make sure you have set your STRIPE_PK environment variable first.
+
+```
+docker compose php php bin/console createSubPlan :planName :price
+```
+```:planName``` Replace it with the name of your choice
+```:price``` Replace it with the price you want the plan to cost, default value is 9.99€
+
 # Deployement
 
 Our deployement is using GCloud architecture.
