@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\Collection;
 use App\Controller\PropositionPostController;
+use App\Controller\PropositionGetOwnController;
 use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -30,8 +31,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     uriTemplate: '/projects/{id}/propositions',
     security: "is_granted('ROLE_ADMIN') or object.getOwner() === user",
     normalizationContext: [
-        'groups' => ['project_get_propositions']
+        'groups' => ['project_get', 'project_get_propositions']
     ]
+)]
+#[Get(
+    uriTemplate: '/projects/{id}/own',
+    controller: PropositionGetOwnController::class,
+    security: "is_granted('ROLE_FREELANCER_PREMIUM')",
 )]
 #[GetCollection(
     normalizationContext: [
