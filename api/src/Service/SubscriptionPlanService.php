@@ -35,7 +35,7 @@ class SubscriptionPlanService
             'product' => $product,
         ]);
 
-        if(!$plan){
+        if(!$plan || empty($plan->id)){
             throw new \Exception('An error occurred, could not create this plan');
         }
 
