@@ -17,7 +17,7 @@ class PropositionGetOwnController extends AbstractController
     public function __invoke(Project $data)
     {
         $user = $this->getUser();
-        $proposition = $this->em->getRepository(Proposition::class)->findBy(['project' => $data, 'freelancer' => $user]);
+        $proposition = $this->em->getRepository(Proposition::class)->findOneBy(['project' => $data, 'freelancer' => $user]);
         return $this->json([
             'proposition' => $proposition
         ],200);
