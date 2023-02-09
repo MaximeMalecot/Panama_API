@@ -2,12 +2,52 @@
 
 namespace App\Entity;
 
-use App\Repository\FilterRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiFilter;
+use App\Repository\FilterRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource]
+#[ApiFilter(SearchFilter::class,properties: ['name' => 'exact','type' => 'exact'])]
+#[Get(
+    security: "is_granted('ROLE_FREELANCER') or is_granted('ROLE_CLIENT')",
+    normalizationContext: [
+        'groups' => ['filter_get']
+    ]
+)]
+#[GetCollection(
+    // security: "is_granted('ROLE_FREELANCER') or is_granted('ROLE_CLIENT')",
+    normalizationContext: [
+        'groups' => ['filter_cget']
+    ]
+)]
+#[Post(
+    security: "is_granted('ROLE_ADMIN')",
+    normalizationContext: [
+        'groups' => ['filter_cget']
+    ],
+    denormalizationContext: [
+        'groups' => ['filter_post']
+    ]
+)]
+#[Patch(
+    security: "is_granted('ROLE_ADMIN')",
+    normalizationContext: [
+        'groups' => ['filter_cget']
+    ],
+    denormalizationContext: [
+        'groups' => ['filter_post']
+    ]
+)]
 #[ORM\Entity(repositoryClass: FilterRepository::class)]
 class Filter
 {
@@ -16,15 +56,19 @@ class Filter
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(["filter_get", "filter_cget"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["filter_get", "filter_cget", "filter_post"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["filter_get", "filter_cget", "filter_post"])]
     private ?string $type = null;
 
-    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'filters')]
+    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'filters', cascade: ['persist', 'remove'])]
+    #[Groups(["filter_get"])]
     private Collection $projects;
 
     public function __construct()
@@ -56,8 +100,10 @@ class Filter
 
     public function setType(?string $type): self
     {
+        if(!in_array($type, ["techno", "other"])){
+            $type = "other";
+        }
         $this->type = $type;
-
         return $this;
     }
 

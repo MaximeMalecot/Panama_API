@@ -2,45 +2,91 @@
 
 namespace App\Entity;
 
-use App\Entity\Pizza;
-use Gedmo\Mapping\Annotation as Gedmo;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
+use App\Dto\UserVerifyEmailDto;
 use Doctrine\ORM\Mapping as ORM;
 use App\Dto\UserResetPasswordDto;
 use App\Repository\UserRepository;
 use ApiPlatform\Metadata\ApiResource;
+use App\Controller\RegisterController;
 use ApiPlatform\Metadata\GetCollection;
+use App\State\UserVerifyEmailProcessor;
+use App\Entity\Traits\TimestampableTrait;
 use App\State\UserResetPasswordProcessor;
 use App\Controller\ResetPasswordController;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use App\Entity\Traits\TimestampableTrait;
 
 #[ApiResource]
 #[Get(
+    security: 'is_granted("ROLE_ADMIN") or object == user',
     normalizationContext: [
         'groups' => ['user_get']
     ]
 )]
+#[Get(
+    security: "is_granted('ROLE_ADMIN') or object == user",
+    uriTemplate: '/users/{id}/projects',
+    normalizationContext: [
+        'groups' => ['user_get_projects']
+    ]
+)]
+#[Get(
+    security: 'is_granted("GET_CLIENT", object)',
+    uriTemplate: '/users/clients/{id}',
+    normalizationContext: [
+        'groups' => ['user_get', 'specific_client_get']
+    ]
+)]
+#[Get(
+    security: 'is_granted("GET_FREELANCER", object)',
+    uriTemplate: '/users/freelancer/{id}',
+    normalizationContext: [
+        'groups' => ['user_get', 'specific_freelancer_get']
+    ]
+)]
+#[Get(
+    security: 'is_granted("ROLE_ADMIN") or object == user',
+    uriTemplate: '/users/{id}/reviews',
+    normalizationContext: [
+        'groups' => ['user_get', 'user_get_reviews']
+    ]
+)]
+#[Get(
+    security: 'is_granted("ROLE_ADMIN") or object == user',
+    uriTemplate: '/users/{id}/propositions',
+    normalizationContext: [
+        'groups' => ['user_get', 'user_get_propositions']
+    ]
+)]
 #[GetCollection(
+    security: "is_granted('ROLE_ADMIN')",
     normalizationContext: [
         'groups' => ['user_cget']
     ]
 )]
+#[Put(
+    security: "is_granted('ROLE_ADMIN') or object == user",
+    denormalizationContext: [
+        'groups' => ['user_modify']
+    ],
+    normalizationContext: [
+        'groups' => ['user_get']
+    ]
+)]
 #[Patch(
-        name: 'forgot_password', 
-        uriTemplate: '/users/forgot-password', 
+        uriTemplate: '/users/forgot_password', 
         controller: ResetPasswordController::class,
         denormalizationContext: [
             'groups' => ['user_resetPwd_request']
@@ -51,29 +97,27 @@ use App\Entity\Traits\TimestampableTrait;
     )
 ]
 #[Patch(
-    name: 'resetPwd', 
-    uriTemplate: '/users/updatePwd', 
+    uriTemplate: '/users/update_password', 
     input: UserResetPasswordDto::class,
     output: User::class,
-    processor: UserResetPasswordProcessor::class
+    processor: UserResetPasswordProcessor::class,
+    status: 204
 )]
-#[Put(
-    security: "is_granted('ROLE_ADMIN') or object.getOwner() == user",
-    denormalizationContext: [
-        'groups' => ['user_modify']
-    ],
-    normalizationContext: [
-        'groups' => ['user_get']
-    ]
+#[Patch(
+    uriTemplate: '/users/verify_email',
+    input: UserVerifyEmailDto::class,
+    output: User::class,
+    processor: UserVerifyEmailProcessor::class,
+    status: 204
 )]
 #[Post(
-    name: 'register', 
-    uriTemplate: '/users/register',
+    uriTemplate: '/register', 
+    controller: RegisterController::class,
     denormalizationContext: [
-        'groups' => ['user_register']
+        'groups' => ['user_write_register']
     ],
     normalizationContext: [
-        'groups' => ['user_cget']
+        'groups' => ['user_register']
     ]
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -86,27 +130,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
     #[NotBlank()]
     #[NotNull()]
     #[Email()]
-    #[Groups(["user_cget", "user_get", "user_register", "user_resetPwd", "user_resetPwd_request"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request",  "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get"])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(["user_write_register", "user_get", "user_register", "client_info_get"])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Groups(["user_get"])]
     // #[Regex("/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/i", message: "Must be minimum eight characters, at least one letter and one number ")]
     private ?string $password = null;
 
-    #[Groups(["user_changePwd", "user_register"])]
+    #[Groups(["user_changePwd", "user_write_register"])]
     private ?string $plainPassword = null;
 
     private ?string $oldPassword = null;
@@ -116,24 +161,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $resetPwdToken = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["user_get", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["user_get", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    #[Groups(["user_get"])]
     private ?bool $isVerified = false;
 
     #[ORM\OneToOne(mappedBy: 'client', cascade: ['persist', 'remove'])]
+    #[Groups(["user_get", "user_register", "specific_client_get"])]
     private ?ClientInfo $clientInfo = null;
 
     #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
+    #[Groups(["user_get", "user_register", "specific_freelancer_get"])]
     private ?FreelancerInfo $freelancerInfo = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Project::class, orphanRemoval: true)]
+    #[Groups(["user_get_projects"])]
     private Collection $createdProjects;
 
-    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Proposition::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'freelancer', targetEntity: Proposition::class, orphanRemoval: true)]
+    #[Groups(["user_get_propositions"])]
     private Collection $propositions;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Invoice::class, orphanRemoval: true)]
@@ -145,12 +197,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $gravatarImage = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $verifyEmailToken = null;
+
+    #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
+    private ?Subscription $subscription = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $stripeId = null;
+    
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $reset_pwd_token_time = null;
+
+
+    #[ORM\OneToMany(mappedBy: 'freelancer', targetEntity: Review::class, orphanRemoval: true)]
+    private Collection $reviews;
+
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Review::class, orphanRemoval: true)]
+    #[Groups(["user_get_reviews"])]
+    private Collection $createdReviews;
+
     public function __construct()
     {
         $this->createdProjects = new ArrayCollection();
         $this->propositions = new ArrayCollection();
         $this->invoices = new ArrayCollection();
         $this->socialLinks = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
+        $this->createdReviews = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -194,6 +268,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setRoles(array $roles): self
     {
+        foreach($roles as $role) {
+            if(!in_array($role, ['ROLE_ADMIN', 'ROLE_CLIENT', 'ROLE_FREELANCER', 'ROLE_FREELANCER_PREMIUM', 'ROLE_USER'])) {
+                throw new \InvalidArgumentException('Invalid role');
+            }
+        }
         $this->roles = $roles;
 
         return $this;
@@ -283,7 +362,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isIsVerified(): ?bool
+    public function getIsVerified(): ?bool
     {
         return $this->isVerified;
     }
@@ -457,6 +536,117 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setGravatarImage(?string $gravatarImage): self
     {
         $this->gravatarImage = $gravatarImage;
+
+        return $this;
+    }
+
+    public function getVerifyEmailToken(): ?string
+    {
+        return $this->verifyEmailToken;
+    }
+
+    public function setVerifyEmailToken(?string $verifyEmailToken): self
+    {
+        $this->verifyEmailToken = $verifyEmailToken;
+
+        return $this;
+    }
+    
+    public function getSubscription(): ?Subscription
+    {
+        return $this->subscription;
+    }
+
+    public function setSubscription(Subscription $subscription): self
+    {
+        // set the owning side of the relation if necessary
+        if ($subscription->getFreelancer() !== $this) {
+            $subscription->setFreelancer($this);
+        }
+
+        $this->subscription = $subscription;
+
+        return $this;
+    }
+
+    public function getStripeId(): ?string
+    {
+        return $this->stripeId;
+    }
+
+    public function setStripeId(?string $stripeId): self
+    {
+        $this->stripeId = $stripeId;
+        return $this;
+    }
+    
+    public function getResetPwdTokenTime(): ?\DateTimeInterface
+    {
+        return $this->reset_pwd_token_time;
+    }
+
+    public function setResetPwdTokenTime(?\DateTimeInterface $reset_pwd_token_time): self
+    {
+        $this->reset_pwd_token_time = $reset_pwd_token_time;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getCreatedReviews(): Collection
+    {
+        return $this->createdReviews;
+    }
+
+    public function addCreatedReview(Review $review): self
+    {
+        if (!$this->createdReviews->contains($review)) {
+            $this->createdReviews[] = $review;
+            $review->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedReview(Review $review): self
+    {
+        if ($this->createdReviews->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getClient() === $this) {
+                $review->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): self
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews[] = $review;
+            $review->setFreelancer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): self
+    {
+        if ($this->reviews->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getFreelancer() === $this) {
+                $review->setFreelancer(null);
+            }
+        }
 
         return $this;
     }

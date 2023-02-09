@@ -3,11 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -54,6 +55,28 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
 
         $this->add($user, true);
+    }
+
+    public function findByRole(array $roles) {
+        if(count($roles) === 0){
+            return [];
+        }
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addRootEntityFromClassMetadata(User::class, 'u');
+        $sql = "SELECT " .  $rsm->generateSelectClause() . " FROM public.user AS u ";
+        foreach(array_keys($roles) as $i ){
+            if($i === 0){
+                $sql .= "WHERE roles::text LIKE :role${i}";
+            } else {
+                $sql .= " OR roles::text LIKE :role${i}";
+            }
+        }
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        foreach($roles as $i=>$role){
+            $query->setParameter("role${i}", '%"' . $role . '"%');
+        }
+
+        return $query->getResult();
     }
 
 //    /**

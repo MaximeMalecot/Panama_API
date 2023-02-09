@@ -2,32 +2,58 @@
 
 namespace App\Entity;
 
-use App\Repository\ClientInfoRepository;
+use ApiPlatform\Metadata\Get;
 use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use App\Repository\ClientInfoRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource]
+#[Get(
+    security: "is_granted('ROLE_ADMIN') or object.getClient() == user",
+    normalizationContext: [
+        'groups' => ["client_info_get"]
+    ],
+)]
+#[Patch(
+    security: "is_granted('ROLE_ADMIN') or object.getClient() === user",
+    normalizationContext: [
+        'groups' => ["client_info_get"]
+    ],
+    denormalizationContext: [
+        'groups' => ["client_info_patch"]
+    ]
+)]
 #[ORM\Entity(repositoryClass: ClientInfoRepository::class)]
 class ClientInfo
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(["client_info_get", "specific_client_get", "user_register"])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
     private ?string $address = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
     private ?string $city = null;
 
-    #[ORM\Column(length: 12)]
+    #[ORM\Column(length: 12, nullable: true)]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
     private ?string $phoneNb = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
     private ?string $description = null;
 
     #[ORM\OneToOne(inversedBy: 'clientInfo', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["client_info_get", "client_info_patch"])]
     private ?User $client = null;
 
     public function getId(): ?int

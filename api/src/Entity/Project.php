@@ -2,47 +2,114 @@
 
 namespace App\Entity;
 
-use App\Repository\ProjectRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation\Slug;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use App\Repository\ProjectRepository;
+use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\Collection;
+use App\Controller\PropositionPostController;
+use App\Controller\PropositionGetOwnController;
+use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'partial', 'status' => 'exact', 'filters.name' => 'exact' ])]
+#[Get(
+    security: "is_granted('ROLE_FREELANCER') or object.getOwner() === user",
+    normalizationContext: [
+        'groups' => ['project_get']
+    ]
+)]
+#[Get(
+    uriTemplate: '/projects/{id}/propositions',
+    security: "is_granted('ROLE_ADMIN') or object.getOwner() === user",
+    normalizationContext: [
+        'groups' => ['project_get', 'project_get_propositions']
+    ]
+)]
+#[Get(
+    uriTemplate: '/projects/{id}/own',
+    controller: PropositionGetOwnController::class,
+    security: "is_granted('ROLE_FREELANCER_PREMIUM')",
+)]
+#[GetCollection(
+    normalizationContext: [
+        'groups' => ['project_cget']
+    ]
+)]
+#[Post(
+    uriTemplate: "/projects/{id}/propositions",
+    controller: PropositionPostController::class,
+    security: "is_granted('CREATE_PROPOSITION', object)",
+)]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
 {
     use TimestampableTrait;
     
+    public const STATUS = [
+        'CREATED' => 'CREATED',
+        'ACTIVE' => 'ACTIVE',
+        'CANCELED' => 'CANCELED',
+        'IN_PROGRESS' => 'IN_PROGRESS',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(["project_get", "project_get_propositions", "user_get_projects", "user_get_propositions"])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'createdProjects')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
-    #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects')]
+    #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects', cascade: ['persist', 'remove'])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "user_get_projects"])]
     private Collection $filters;
 
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: Proposition::class)]
+    #[Groups(["project_get_own", "project_get_propositions", "user_get_projects"])]
     private Collection $propositions;
 
     #[ORM\OneToOne(mappedBy: 'project', cascade: ['persist', 'remove'])]
+    #[Groups(["project_get_own"])]
     private ?Invoice $invoice = null;
 
     #[ORM\Column]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
     private ?int $minPrice = null;
 
     #[ORM\Column]
+    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
     private ?int $maxPrice = null;
+
+    #[ORM\Column(length: 255, options: ['default' => 'CREATED'])]
+    #[Groups(["project_get_own", "project_get_propositions", "user_get_projects", "project_cget"])]
+    private ?string $status = "CREATED";
+
+    #[ORM\Column]
+    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
+    private ?int $length = null;
+    
+    #[ORM\Column(length: 128, unique: true)]
+    #[Slug(fields: ['id', 'name'])]
+    private $slug;
 
     public function __construct()
     {
@@ -187,5 +254,34 @@ class Project
         $this->maxPrice = $maxPrice;
 
         return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getLength(): ?int
+    {
+        return $this->length;
+    }
+
+    public function setLength(int $length): self
+    {
+        $this->length = $length;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
     }
 }

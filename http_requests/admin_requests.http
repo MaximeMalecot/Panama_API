@@ -1,0 +1,25 @@
+# @name login_admin
+POST https://localhost:443/authentication_token
+content-type: application/json
+
+{
+    "email": "admin@admin.com",
+    "password": "test"
+}
+
+@admin_token = {{login_admin.response.body.token}}
+
+# Create a project 
+POST https://localhost:443/payment/create_checkout
+content-type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+    "name": "test",
+    "description": "lorem",
+    "minPrice": 10,
+    "maxPrice": 100,
+    "filters": [],
+    "length: 10
+}
+

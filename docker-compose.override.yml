@@ -4,27 +4,27 @@ version: "3.4"
 services:
   php:
     volumes:
-      - ./api:/srv/api:rw,cached
-      - ./api/docker/php/conf.d/api-platform.dev.ini:/usr/local/etc/php/conf.d/api-platform.ini
-      # if you develop on Linux, you may use a bind-mounted host directory instead
-      # - ./api/var:/srv/api/var:rw
+      - ./api:/var/www:rw,cached
+      - /var/www/var
+      - /var/www/vendor
     environment:
       APP_ENV: dev
-
-  caddy:
-    volumes:
-      - ./api/docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./api/public:/srv/api/public:ro
-    environment:
-      MERCURE_EXTRA_DIRECTIVES: demo
-
-###> doctrine/doctrine-bundle ###
+      KYC_API_URL: http://kyc:3000/check
+      HOST: php
+      MAILER_URL: smtp://mailcatcher:1025
+  
+###> symfony/mailer ###
+  mailer:
+    image: schickling/mailcatcher
+    ports: 
+      - 1025:1025
+      - 1080:1080
+    networks:
+      - apis
+###< symfony/mailer ###
+      
   database:
     ports:
       - target: 5432
         published: 5432
         protocol: tcp
-###< doctrine/doctrine-bundle ###
-
-###> symfony/mercure-bundle ###
-###< symfony/mercure-bundle ###

@@ -1,0 +1,31 @@
+## LOGIN AS CLIENT
+# @name login_client
+POST https://localhost:443/authentication_token
+Content-Type: application/json
+
+{
+    "email": "client@client.com",
+    "password": "test"
+}
+
+### 
+@client_token = {{login_client.response.body.token}}
+
+## CREATE A PROJECT
+# @name create_project
+POST https://localhost:443/payment/create_checkout
+Content-Type: application/json
+Authorization: Bearer {{client_token}}
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+
+
+{
+    "name": "test",
+    "description": "lorem",
+    "minPrice": 10,
+    "maxPrice": 100,
+    "filters": [],
+    "length": 10
+}
+

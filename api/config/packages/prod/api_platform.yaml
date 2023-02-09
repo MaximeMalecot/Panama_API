@@ -1,0 +1,28 @@
+api_platform:
+    title: Hello API Platform
+    version: 1.0.0
+    mapping:
+        paths: ['%kernel.project_dir%/src/Entity']
+    patch_formats:
+        json: ['application/merge-patch+json']
+    swagger:
+        versions: [3]
+        api_keys:
+            JWT:
+                name: Authorization
+                type: header
+    # Enabling only JSON-LD and JSON formats while disabling HTML format
+    formats:
+        json:
+            mime_types: ['application/json']
+    # Disabling the displaying of the API documentation 
+    enable_swagger_ui: false
+    enable_re_doc: false
+    enable_docs: false
+    enable_entrypoint: false
+
+    defaults:
+        pagination_items_per_page: 30
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
