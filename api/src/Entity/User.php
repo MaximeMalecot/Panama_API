@@ -63,6 +63,13 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         'groups' => ['user_get', 'user_get_reviews']
     ]
 )]
+#[Get(
+    security: 'is_granted("ROLE_ADMIN") or object == user',
+    uriTemplate: '/users/{id}/propositions',
+    normalizationContext: [
+        'groups' => ['user_get', 'user_get_propositions']
+    ]
+)]
 #[GetCollection(
     security: "is_granted('ROLE_ADMIN')",
     normalizationContext: [
@@ -178,6 +185,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $createdProjects;
 
     #[ORM\OneToMany(mappedBy: 'freelancer', targetEntity: Proposition::class, orphanRemoval: true)]
+    #[Groups(["user_get_propositions"])]
     private Collection $propositions;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Invoice::class, orphanRemoval: true)]

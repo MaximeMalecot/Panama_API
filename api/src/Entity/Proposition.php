@@ -45,15 +45,15 @@ class Proposition
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["project_get_propositions", "proposition_get", "proposition_cget"])]
+    #[Groups(["project_get_propositions", "proposition_get", "proposition_cget", "user_get_propositions"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["project_get_propositions", "proposition_get", "proposition_cget"])]
+    #[Groups(["project_get_propositions", "proposition_get", "proposition_cget", "user_get_propositions"])]
     private ?string $status = 'AWAITING';
 
     #[ORM\ManyToOne(inversedBy: "propositions")]
-    #[Groups(["proposition_get", "proposition_cget"])]
+    #[Groups(["proposition_get", "proposition_cget", "user_get_propositions"])]
     private ?Project $project = null;
 
     #[ORM\ManyToOne(inversedBy: "propositions")]
