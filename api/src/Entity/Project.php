@@ -47,7 +47,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[Post(
     uriTemplate: "/projects/{id}/propositions",
     controller: PropositionPostController::class,
-    security: "is_granted('ROLE_FREELANCER_PREMIUM') and object.getStatus() === 'ACTIVE'",
+    security: "is_granted('CREATE_PROPOSITION', object)",
 )]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project

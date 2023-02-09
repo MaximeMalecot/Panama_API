@@ -2,15 +2,17 @@
 
 namespace App\Security\Voter;
 
-use App\Entity\Proposition;
+use App\Entity\User;
+use App\Entity\Project;
+use \App\Entity\Subscription;
 use App\Repository\PropositionRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class PropositionVoter extends Voter
+class ProjectVoter extends Voter
 {
-    public const MODIFY_PROPOSITION = 'MODIFY_PROPOSITION';
+    public const CREATE_PROPOSITION = 'CREATE_PROPOSITION';
 
     public function __construct(private PropositionRepository $propositionRepository){}
 
@@ -18,8 +20,8 @@ class PropositionVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, [self::MODIFY_PROPOSITION])
-            && $subject instanceof Proposition;
+        return in_array($attribute, [ self::CREATE_PROPOSITION])
+        && $subject instanceof Project;
     }
 
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
@@ -29,12 +31,19 @@ class PropositionVoter extends Voter
         if (!$user instanceof UserInterface) {
             return false;
         }
-        dump(in_array("ROLE_ADMIN", $user->getRoles()) || (in_array("ROLE_CLIENT", $user->getRoles()) && $subject->getStatus() === "AWAITING" && $subject->getProject()->getStatus() === "ACTIVE" && $subject->getProject()->getOwner() === $user));
+        
         switch ($attribute) {
-            case self::MODIFY_PROPOSITION:
-                return in_array("ROLE_ADMIN", $user->getRoles()) || (in_array("ROLE_CLIENT", $user->getRoles()) && $subject->getStatus() === "AWAITING" && $subject->getProject()->getStatus() === "ACTIVE" && $subject->getProject()->getOwner() === $user);
-                break;
+            case self::CREATE_PROPOSITION:
+                return $this->canCreateProposition($user, $subject);
         }
+
+        return false;
+    }
+
+    public function canCreateProposition(User $user, Project $project){
+        if( in_array("ROLE_ADMIN", $user->getRoles()) ) return true;
+        if( in_array("ROLE_FREELANCER_PREMIUM", $user->getRoles()) ) 
+            return $project->getStatus() === "ACTIVE" && $this->propositionRepository->findOneBy(['project' => $project, 'freelancer' => $user]) === null;
         return false;
     }
 }
