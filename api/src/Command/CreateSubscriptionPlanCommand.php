@@ -54,7 +54,7 @@ class CreateSubscriptionPlanCommand extends Command
             }
     
             if ( empty($price)) {
-                $price = 9.99;
+                $price = 9.99*100;
             }
 
             $product = $this->createProduct();
