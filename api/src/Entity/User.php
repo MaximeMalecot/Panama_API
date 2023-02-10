@@ -86,6 +86,16 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     ]
 )]
 #[Patch(
+    uriTemplate: '/users/modify_password/{id}', 
+    security: "object == user",
+    denormalizationContext: [
+        'groups' => ['user_modify_pwd']
+    ],
+    normalizationContext: [
+        'groups' => ['user_get']
+    ]
+)]
+#[Patch(
         uriTemplate: '/users/forgot_password', 
         controller: ResetPasswordController::class,
         denormalizationContext: [
@@ -137,7 +147,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[NotBlank()]
     #[NotNull()]
     #[Email()]
-    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request",  "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request",  "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_modify"])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -151,9 +161,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // #[Regex("/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/i", message: "Must be minimum eight characters, at least one letter and one number ")]
     private ?string $password = null;
 
-    #[Groups(["user_changePwd", "user_write_register"])]
+    #[Groups(["user_changePwd", "user_write_register", "user_modify_pwd"])]
     private ?string $plainPassword = null;
 
+    #[Groups(["user_modify_pwd"])]
     private ?string $oldPassword = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -161,11 +172,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $resetPwdToken = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
+    #[Groups(["user_get", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
+    #[Groups(["user_get", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
