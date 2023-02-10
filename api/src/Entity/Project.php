@@ -78,15 +78,15 @@ class Project
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions"])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions", "invoice_get"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions", "project_patch"])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions", "project_patch", "invoice_get"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["project_get", "project_get_propositions", "user_get_projects", "user_get_propositions", "project_patch"])]
+    #[Groups(["project_get", "project_get_propositions", "user_get_projects", "user_get_propositions", "project_patch", "invoice_get"])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'createdProjects')]
@@ -106,11 +106,11 @@ class Project
     private ?Invoice $invoice = null;
 
     #[ORM\Column]
-    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "project_patch"])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
     private ?int $minPrice = null;
 
     #[ORM\Column]
-    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "project_patch"])]
+    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
     private ?int $maxPrice = null;
 
     #[ORM\Column(length: 255, options: ['default' => 'CREATED'])]
@@ -118,7 +118,7 @@ class Project
     private ?string $status = "CREATED";
 
     #[ORM\Column]
-    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "project_patch"])]
+    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
     private ?int $length = null;
     
     #[ORM\Column(length: 128, unique: true)]

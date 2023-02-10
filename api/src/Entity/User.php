@@ -140,14 +140,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
     #[NotBlank()]
     #[NotNull()]
     #[Email()]
-    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request",  "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_modify"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request",  "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_modify", "invoice_get"])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -172,11 +172,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $resetPwdToken = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
+    #[Groups(["user_get", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
+    #[Groups(["user_get", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]

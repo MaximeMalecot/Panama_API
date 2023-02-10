@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[Patch(
-    security: "is_granted('ROLE_ADMIN') or (object.getFreelancer() === user and is_granted('ROLE_FREELANCER'))",
+    security: "is_granted('ROLE_ADMIN') or (is_granted('ROLE_FREELANCER') and object.getFreelancer() === user)",
     normalizationContext: [
         'groups' => ["freelancer_info_get"]
     ],
