@@ -22,7 +22,6 @@ class FreelancerGetProjectsController extends AbstractController
     {
         $status = $this->requestStack->getCurrentRequest()->get('status');
         $projects = $this->em->getRepository(Project::class)->getFreelancerProjects($data, $status);
-        dump($projects);
         return $projects;
     }
 }
