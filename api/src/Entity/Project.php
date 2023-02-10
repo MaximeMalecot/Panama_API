@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\Slug;
@@ -59,6 +60,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
     controller: PropositionPostController::class,
     security: "is_granted('CREATE_PROPOSITION', object)",
 )]
+#[Delete(
+    security: "is_granted('DELETE_PROJECT', object)",
+)]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
 {
@@ -89,11 +93,11 @@ class Project
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
-    #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects', cascade: ['persist'])]
     #[Groups(["project_get", "project_cget", "project_get_propositions", "user_get_projects", "project_patch"])]
     private Collection $filters;
 
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Proposition::class)]
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Proposition::class, orphanRemoval: true)]
     #[Groups(["project_get_own", "project_get_propositions", "user_get_projects"])]
     private Collection $propositions;
 

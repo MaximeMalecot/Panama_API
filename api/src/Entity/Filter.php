@@ -71,7 +71,7 @@ class Filter
     #[Groups(["filter_get", "filter_cget", "filter_post"])]
     private ?string $type = null;
 
-    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'filters', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'filters', cascade: ['persist'])]
     #[Groups(["filter_get"])]
     private Collection $projects;
 
