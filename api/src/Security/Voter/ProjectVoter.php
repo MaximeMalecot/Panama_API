@@ -43,14 +43,14 @@ class ProjectVoter extends Voter
         return false;
     }
 
-    public function canCreateProposition(User $user, Project $project){
+    private function canCreateProposition(User $user, Project $project){
         if( in_array("ROLE_ADMIN", $user->getRoles()) ) return true;
         if( in_array("ROLE_FREELANCER_PREMIUM", $user->getRoles()) ) 
             return $project->getStatus() === "ACTIVE" && $this->propositionRepository->findOneBy(['project' => $project, 'freelancer' => $user]) === null;
         return false;
     }
 
-    public function canDeleteProject(User $user, Project $project){
+    private function canDeleteProject(User $user, Project $project){
         if($project->getStatus() !== "ACTIVE" && $project->getStatus() !== "CREATED") return false;
         if( in_array("ROLE_ADMIN", $user->getRoles()) ) return true;
         return $project->getOwner() === $user;

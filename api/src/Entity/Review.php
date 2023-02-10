@@ -25,13 +25,6 @@ use Symfony\Component\Validator\Constraints as Assert;
         'groups' => ['review_cget']
     ]
 )]
-#[Post(
-    security: "is_granted('ROLE_CLIENT')",
-    controller: ReviewPostController::class,
-    normalizationContext: [
-        'groups' => ['review_get']
-    ],
-)]
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
 class Review
 {

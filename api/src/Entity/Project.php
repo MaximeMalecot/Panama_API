@@ -4,15 +4,16 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
+use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\Slug;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProjectRepository;
 use ApiPlatform\Metadata\GetCollection;
+use App\Controller\ProjetCloseController;
 use App\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\Collection;
 use App\Controller\PropositionPostController;
@@ -60,6 +61,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
     controller: PropositionPostController::class,
     security: "is_granted('CREATE_PROPOSITION', object)",
 )]
+#[Patch(
+    uriTemplate: "/projects/{id}/close",
+    controller: ProjetCloseController::class,
+    security: "object.getStatus() === 'IN_PROGRESS' and (is_granted('ROLE_ADMIN') or object.getOwner() == user)",
+)]
 #[Delete(
     security: "is_granted('DELETE_PROJECT', object)",
 )]
@@ -73,6 +79,7 @@ class Project
         'ACTIVE' => 'ACTIVE',
         'CANCELED' => 'CANCELED',
         'IN_PROGRESS' => 'IN_PROGRESS',
+        'ENDED' => 'ENDED',
     ];
 
     #[ORM\Id]

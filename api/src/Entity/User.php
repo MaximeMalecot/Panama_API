@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Controller\RegisterController;
 use ApiPlatform\Metadata\GetCollection;
 use App\State\UserVerifyEmailProcessor;
+use App\Controller\ReviewPostController;
 use App\Entity\Traits\TimestampableTrait;
 use App\State\UserResetPasswordProcessor;
 use App\Controller\ResetPasswordController;
@@ -138,6 +139,14 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     normalizationContext: [
         'groups' => ['user_register']
     ]
+)]
+#[Post(
+    uriTemplate: '/users/{id}/reviews',
+    security: "is_granted('REVIEW_FREELANCER', object)",
+    controller: ReviewPostController::class,
+    normalizationContext: [
+        'groups' => ['review_get']
+    ],
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]

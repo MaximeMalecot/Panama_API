@@ -82,6 +82,26 @@ class ProjectRepository extends ServiceEntityRepository
         return false;
     }
 
+    public function hasCommonPastProject(User $client, User $freelancer){
+        $qb = $this->createQueryBuilder("p");
+        $v = $qb->where("p.owner = :cId")
+            ->innerJoin("p.propositions", "pr")
+            ->andWhere("pr.freelancer = :fId" )
+            ->andWhere("pr.status = 'ACCEPTED'")
+            ->andWhere("p.status = 'ENDED'")
+            ->setParameters([ 
+                "cId" => $client->getId(),
+                "fId" => $freelancer->getId()
+            ])
+            ->getQuery()
+            ->getResult();
+        if(count($v) > 0){
+            return true;
+        }
+        return false;
+
+    }
+
     public function getFreelancerProjects(User $user, array $status=null){
         $qb = $this->createQueryBuilder("p");
         $qb->innerJoin("p.propositions", "pr")
