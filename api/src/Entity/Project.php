@@ -78,23 +78,24 @@ class Project
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions", "invoice_get"])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions", "invoice_get", "project_freelancer_own"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions", "project_patch", "invoice_get"])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions", "project_patch", "invoice_get", "project_freelancer_own"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["project_get", "project_get_propositions", "user_get_projects", "user_get_propositions", "project_patch", "invoice_get"])]
+    #[Groups(["project_get", "project_get_propositions", "user_get_projects", "user_get_propositions", "project_patch", "invoice_get", "project_freelancer_own"])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'createdProjects')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["project_freelancer_own"])]
     private ?User $owner = null;
 
     #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects', cascade: ['persist'])]
-    #[Groups(["project_get", "project_cget", "project_get_propositions", "user_get_projects", "project_patch"])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "user_get_projects", "project_patch", "project_freelancer_own"])]
     private Collection $filters;
 
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: Proposition::class, orphanRemoval: true)]
@@ -106,19 +107,19 @@ class Project
     private ?Invoice $invoice = null;
 
     #[ORM\Column]
-    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "project_freelancer_own"])]
     private ?int $minPrice = null;
 
     #[ORM\Column]
-    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
+    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "project_freelancer_own"])]
     private ?int $maxPrice = null;
 
     #[ORM\Column(length: 255, options: ['default' => 'CREATED'])]
-    #[Groups(["project_get_own", "project_get_propositions", "user_get_projects", "project_cget"])]
+    #[Groups(["project_get_own", "project_get_propositions", "user_get_projects", "project_cget", "project_freelancer_own"])]
     private ?string $status = "CREATED";
 
     #[ORM\Column]
-    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
+    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "project_freelancer_own"])]
     private ?int $length = null;
     
     #[ORM\Column(length: 128, unique: true)]

@@ -64,11 +64,11 @@ class Filter
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["filter_get", "filter_cget", "filter_post", "project_cget", "project_get"])]
+    #[Groups(["filter_get", "filter_cget", "filter_post", "project_cget", "project_get", "project_freelancer_own"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["filter_get", "filter_cget", "filter_post"])]
+    #[Groups(["filter_get", "filter_cget", "filter_post", "project_freelancer_own"])]
     private ?string $type = null;
 
     #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'filters', cascade: ['persist'])]

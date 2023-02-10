@@ -81,4 +81,19 @@ class ProjectRepository extends ServiceEntityRepository
         }
         return false;
     }
+
+    public function getFreelancerProjects(User $user, array $status=null){
+        $qb = $this->createQueryBuilder("p");
+        $qb->innerJoin("p.propositions", "pr")
+            ->andWhere("pr.freelancer = :fId" )
+            ->andWhere("pr.status = 'ACCEPTED'")
+            ->setParameters([ 
+                "fId" => $user->getId()
+            ]);
+        if($status != null){
+            $qb->andWhere("p.status IN (:status)")
+                ->setParameter("status", $status);
+        }
+        return $qb->getQuery()->getResult();
+    }
 }

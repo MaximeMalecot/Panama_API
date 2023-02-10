@@ -34,8 +34,6 @@ class PropositionPatchController extends AbstractController
             }
         }
         $this->em->flush();
-        return $this->json([
-            'project' => $proposition->getProject()
-        ], 201);
+        return $proposition;
     }
 }

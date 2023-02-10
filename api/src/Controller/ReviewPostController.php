@@ -42,9 +42,7 @@ class ReviewPostController extends AbstractController
                 ->setContent($content);
             $this->em->persist($review);
             $this->em->flush();
-            return $this->json([
-                'review' => $review
-            ], 201);
+            return $review;
         } else {
             return $this->json("You can't review this freelancer", 403);
         }

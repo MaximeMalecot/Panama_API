@@ -43,6 +43,6 @@ class SubscriptionPlanPostController extends AbstractController
             ->setStripeId($data->stripeId);
         $this->em->persist($subscriptionPlan);
         $this->em->flush();
-        return $this->json($subscriptionPlan, 201);
+        return $subscriptionPlan;
     }
 }
