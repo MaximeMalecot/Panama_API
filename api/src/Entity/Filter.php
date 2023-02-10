@@ -18,7 +18,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
-#[ApiFilter(SearchFilter::class,properties: ['name' => 'exact','type' => 'exact'])]
+#[ApiFilter(SearchFilter::class,properties: ['name' => 'partial','type' => 'exact'])]
 #[Get(
     security: "is_granted('ROLE_FREELANCER') or is_granted('ROLE_CLIENT')",
     normalizationContext: [
@@ -64,7 +64,7 @@ class Filter
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["filter_get", "filter_cget", "filter_post"])]
+    #[Groups(["filter_get", "filter_cget", "filter_post", "project_cget", "project_get"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
