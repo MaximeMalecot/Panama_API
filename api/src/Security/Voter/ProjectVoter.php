@@ -51,7 +51,7 @@ class ProjectVoter extends Voter
     }
 
     public function canDeleteProject(User $user, Project $project){
-        if($project->getStatus() === "IN_PROGRESS") return false;
+        if($project->getStatus() !== "ACTIVE" || $project->getStatus() !== "CREATED") return false;
         if( in_array("ROLE_ADMIN", $user->getRoles()) ) return true;
         return $project->getOwner() === $user;
     }
