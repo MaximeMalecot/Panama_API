@@ -2,15 +2,18 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\Get;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\Collection;
 use App\Repository\SubscriptionPlanRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Controller\SubscriptionPlanPostController;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
@@ -26,6 +29,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'groups' => ['subscription_plan_cget']
     ]
 )]
+#[Post(
+    security: "is_granted('ROLE_ADMIN')",
+    controller: SubscriptionPlanPostController::class,
+    normalizationContext: [
+        'groups' => ['subscription_plan_get']
+    ],
+    denormalizationContext: [
+        'groups' => ['subscription_plan_post']
+    ]
+)]
+#[Patch(
+    security: "is_granted('ROLE_ADMIN')",
+    normalizationContext: [
+        'groups' => ['subscription_plan_get']
+    ],
+    denormalizationContext: [
+        'groups' => ['subscription_plan_patch']
+    ]
+)]
 #[ORM\Entity(repositoryClass: SubscriptionPlanRepository::class)]
 class SubscriptionPlan
 {
@@ -38,15 +60,15 @@ class SubscriptionPlan
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["subscription_plan_get", "subscription_plan_cget", "subscription_get", "subscription_cget"])]
+    #[Groups(["subscription_plan_get", "subscription_plan_cget", "subscription_get", "subscription_cget", "subscription_plan_post", "subscription_plan_patch"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["subscription_plan_get", "subscription_plan_cget"])]
+    #[Groups(["subscription_plan_get", "subscription_plan_cget", "subscription_plan_post",  "subscription_plan_patch"])]
     private ?string $description = null;
 
     #[ORM\Column(length: 7)]
-    #[Groups(["subscription_plan_get", "subscription_plan_cget"])]
+    #[Groups(["subscription_plan_get", "subscription_plan_cget",  "subscription_plan_post", "subscription_plan_patch"])]
     private ?string $color = null;
 
     #[ORM\Column]
@@ -54,7 +76,7 @@ class SubscriptionPlan
     private ?float $price = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["subscription_plan_get", "subscription_get"])]
+    #[Groups(["subscription_plan_get", "subscription_get", "subscription_plan_post"])]
     private ?string $stripeId = null;
 
     #[ORM\OneToMany(mappedBy: 'plan', targetEntity: Subscription::class, orphanRemoval: true)]

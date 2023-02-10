@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\Slug;
@@ -44,6 +45,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'groups' => ['project_cget']
     ]
 )]
+#[Patch(
+    security: "is_granted('ROLE_ADMIN')",
+    normalizationContext: [
+        'groups' => ['project_cget']
+    ],
+    denormalizationContext: [
+        'groups' => ['project_patch']
+    ]
+)]
 #[Post(
     uriTemplate: "/projects/{id}/propositions",
     controller: PropositionPostController::class,
@@ -68,11 +78,11 @@ class Project
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions"])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions", "project_patch"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["project_get", "project_get_propositions", "user_get_projects", "user_get_propositions"])]
+    #[Groups(["project_get", "project_get_propositions", "user_get_projects", "user_get_propositions", "project_patch"])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'createdProjects')]
@@ -80,7 +90,7 @@ class Project
     private ?User $owner = null;
 
     #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects', cascade: ['persist', 'remove'])]
-    #[Groups(["project_get", "project_cget", "project_get_propositions", "user_get_projects"])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "user_get_projects", "project_patch"])]
     private Collection $filters;
 
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: Proposition::class)]
@@ -92,11 +102,11 @@ class Project
     private ?Invoice $invoice = null;
 
     #[ORM\Column]
-    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "project_patch"])]
     private ?int $minPrice = null;
 
     #[ORM\Column]
-    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
+    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "project_patch"])]
     private ?int $maxPrice = null;
 
     #[ORM\Column(length: 255, options: ['default' => 'CREATED'])]
@@ -104,7 +114,7 @@ class Project
     private ?string $status = "CREATED";
 
     #[ORM\Column]
-    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects"])]
+    #[Groups(["project_get",  "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "project_patch"])]
     private ?int $length = null;
     
     #[ORM\Column(length: 128, unique: true)]

@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use App\Repository\FilterRepository;
@@ -47,6 +48,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
     denormalizationContext: [
         'groups' => ['filter_post']
     ]
+)]
+#[Delete(
+    security: "is_granted('ROLE_ADMIN')",
 )]
 #[ORM\Entity(repositoryClass: FilterRepository::class)]
 class Filter
