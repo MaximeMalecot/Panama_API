@@ -61,8 +61,11 @@ class RegisterController extends AbstractController
             ->to($email)
             ->subject('Verify your account')
             ->htmlTemplate('mail/Verify-account.html.twig')
-            ->context(['name'=> $user->getName(). " ".$user->getSurname(),
-                        'token' => $user->getVerifyEmailToken()]);
+            ->context([
+                'name'=> $user->getName(). " ".$user->getSurname(),
+                'token' => $user->getVerifyEmailToken(),
+                'url' => $_ENV['FRONT_URL']
+            ]);
         $mailer->send($emailconfig);
 
 

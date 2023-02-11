@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 
 #[Route('/webhook')]
 #[AsController]
@@ -82,7 +85,7 @@ class WebhookController extends AbstractController
     }
 
     #[Route('/kyc_verification/{id}', name: 'kyc_verification', methods: ['POST'])]
-    public function kycVerification(Request $request, EntityManagerInterface $em, UserRepository $userRepository){
+    public function kycVerification(Request $request, EntityManagerInterface $em, UserRepository $userRepository, MailerInterface $mailer){
         $validStatus = ['success', 'failed'];
         $userId = $request->get("id");
         $status = $request->query->get("status");
@@ -103,6 +106,18 @@ class WebhookController extends AbstractController
         if($status === 'failed') return $this->json(200);
         $user->getFreelancerInfo()->setIsVerified(true);
         $em->flush();
+
+        $emailconfig = (new TemplatedEmail())
+            ->from(new Address('panama@easylocmoto.fr','Panama Agency'))
+            ->to($user->getEmail())
+            ->subject('Information verified')
+            ->htmlTemplate('mail/Kyc-verified.html.twig')
+            ->context([
+                'name'=> $user->getName(). " ".$user->getSurname(),
+                'url' => $_ENV['FRONT_URL']
+            ]);
+        $mailer->send($emailconfig);
+
         return $this->json(200);
     }
 
