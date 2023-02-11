@@ -34,14 +34,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[Get(
     security: 'is_granted("ROLE_ADMIN") or object == user',
     normalizationContext: [
-        'groups' => ['user_get']
-    ]
-)]
-#[Get(
-    uriTemplate: '/users/{id}/admin',
-    security: 'is_granted("ROLE_ADMIN") ',
-    normalizationContext: [
-        'groups' => ['user_get', 'user_admin_get', 'timestamp']
+        'groups' => ['user_get', 'timestamp']
     ]
 )]
 #[Get(
@@ -209,11 +202,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $isVerified = false;
 
     #[ORM\OneToOne(mappedBy: 'client', cascade: ['persist', 'remove'])]
-    #[Groups(["user_get", "user_register", "specific_client_get", 'user_admin_get'])]
+    #[Groups(["user_get", "user_register", "specific_client_get"])]
     private ?ClientInfo $clientInfo = null;
 
     #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
-    #[Groups(["user_get", "user_register", "specific_freelancer_get", 'user_admin_get'])]
+    #[Groups(["user_get", "user_register", "specific_freelancer_get"])]
     private ?FreelancerInfo $freelancerInfo = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Project::class, orphanRemoval: true)]
@@ -221,11 +214,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $createdProjects;
 
     #[ORM\OneToMany(mappedBy: 'freelancer', targetEntity: Proposition::class, orphanRemoval: true)]
-    #[Groups(["user_get_propositions", 'user_admin_get'])]
+    #[Groups(["user_get_propositions", "user_get"])]
     private Collection $propositions;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Invoice::class, orphanRemoval: true)]
-    #[Groups(["user_admin_get"])]
+    #[Groups(["user_get"])]
     private Collection $invoices;
 
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: SocialLink::class, orphanRemoval: true)]
@@ -238,7 +231,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $verifyEmailToken = null;
 
     #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
-    #[Groups(['user_admin_get'])]
+    #[Groups(['user_get'])]
     private ?Subscription $subscription = null;
 
     #[ORM\Column(length: 255, nullable: true)]

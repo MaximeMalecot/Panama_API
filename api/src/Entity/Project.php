@@ -93,7 +93,7 @@ class Project
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions", "project_patch", "invoice_get", "project_freelancer_own", 'user_admin_get'])]
+    #[Groups(["project_get", "project_cget", "project_get_propositions", "proposition_cget", "user_get_projects", "user_get_propositions", "project_patch", "invoice_get", "project_freelancer_own", 'user_get'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
