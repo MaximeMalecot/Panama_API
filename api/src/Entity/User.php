@@ -169,7 +169,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(["user_write_register", "user_get", "user_register", "client_info_get"])]
+    #[Groups(["user_write_register", "user_cget",  "user_get", "user_register", "client_info_get"])]
     private array $roles = [];
 
     /**

@@ -60,7 +60,7 @@ class Filter
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["filter_get", "filter_cget"])]
+    #[Groups(["filter_get", "filter_cget", "project_cget"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]

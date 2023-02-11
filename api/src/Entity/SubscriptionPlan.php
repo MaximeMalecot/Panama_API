@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[Get(
     security: "is_granted('ROLE_ADMIN')",
     normalizationContext: [
-        'groups' => ['subscription_plan_get']
+        'groups' => ['subscription_plan_get', 'timestamp']
     ]
 )]
 #[GetCollection(
