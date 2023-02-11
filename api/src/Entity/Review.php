@@ -13,8 +13,11 @@ use App\Controller\ReviewPostController;
 use App\Entity\Traits\TimestampableTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 
 #[ApiResource]
+#[ApiFilter(SearchFilter::class, properties: ['client.id' => 'exact', 'freelancer.id' => 'exact'])]
 #[Get(
     normalizationContext: [
         'groups' => ['review_get']
