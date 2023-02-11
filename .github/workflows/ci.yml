@@ -34,11 +34,7 @@
 #           exit 1
 #       - name: Check HTTP reachability
 #         run: curl -v -o /dev/null http://localhost
-#       - name: Check HTTPS reachability
-#         run: curl  -vk -o /dev/null https://localhost
 #       - name: PHPUnit
 #         run: docker-compose exec -T php bin/phpunit
 #       - name: Doctrine Schema Validator
 #         run: docker-compose exec -T php bin/console doctrine:schema:validate --skip-sync
-#       - name: Jest
-#         run: docker-compose exec -T pwa yarn test --ci --passWithNoTests
