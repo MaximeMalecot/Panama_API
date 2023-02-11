@@ -42,6 +42,10 @@ class RegisterController extends AbstractController
                  ->setVerifyEmailToken(bin2hex(random_bytes(32)));
         $user->setPassword($this->encoder->hashPassword($user, $user->getPlainPassword()));
 
+        if( !in_array("ROLE_CLIENT", $roles) && !in_array("ROLE_FREELANCER", $roles) || in_array("ROLE_ADMIN", $roles) || in_array("ROLE_FREELANCER_PREMIUM", $roles)){
+            throw $this->createNotFoundException('Unknown role');
+        }
+
         if( in_array("ROLE_CLIENT", $roles) ){
             $profile = (new ClientInfo())->setClient($user);
             $this->em->persist($profile);
