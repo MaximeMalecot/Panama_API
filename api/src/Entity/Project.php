@@ -50,7 +50,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[Patch(
     security: "(is_granted('ROLE_ADMIN') or object.getOwner() === user) and object.getStatus() === 'ACTIVE'",
     normalizationContext: [
-        'groups' => ['project_cget']
+        'groups' => ['project_get', 'project_get_propositions', 'timestamp']
     ],
     denormalizationContext: [
         'groups' => ['project_patch']
