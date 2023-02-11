@@ -20,10 +20,14 @@ use App\Controller\PropositionPostController;
 use App\Controller\PropositionGetOwnController;
 use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'partial', 'status' => 'exact', 'filters.name' => 'exact' ])]
+#[ApiFilter(RangeFilter::class, properties: ['maxPrice', 'minPrice'])]
+#[ApiFilter(NumericFilter::class, properties: ['length'])]
 #[Get(
     security: "is_granted('ROLE_FREELANCER') or object.getOwner() === user",
     normalizationContext: [
