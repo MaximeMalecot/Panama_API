@@ -34,7 +34,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     uriTemplate: '/projects/{id}/propositions',
     security: "is_granted('ROLE_ADMIN') or object.getOwner() === user",
     normalizationContext: [
-        'groups' => ['project_get', 'project_get_propositions']
+        'groups' => ['project_get', 'project_get_propositions', 'timestamp']
     ]
 )]
 #[Get(
@@ -48,7 +48,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[Patch(
-    security: "is_granted('ROLE_ADMIN')",
+    security: "(is_granted('ROLE_ADMIN') or object.getOwner() === user) and object.getStatus() === 'ACTIVE'",
     normalizationContext: [
         'groups' => ['project_cget']
     ],
