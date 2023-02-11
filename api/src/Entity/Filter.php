@@ -104,10 +104,8 @@ class Filter
 
     public function setType(?string $type): self
     {
-        if(!in_array($type, ["techno", "other"])){
-            $type = "other";
-        }
         $this->type = $type;
+        
         return $this;
     }
 
