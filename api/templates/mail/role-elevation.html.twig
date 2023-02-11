@@ -2,7 +2,11 @@
     <h1>Votre profil de freelancer a bien été vérifié !</h1>
 
     <p>Bonjour {{ name }},</p>
-    <p>Votre profil étant maintenant vérifié, vous aurez plus d'accès au site.</p>
+    {% if text is defined and text is not null %}
+        <p>{{ text }}</p>
+    {% else %}
+        <p>Des modifications apportées à votre compte ont modifié vos droits d'accès !</p>
+    {% endif %}
     <p>N'oubliez pas de vous reconnecter pour charger vos nouvelles fonctionnalités.</p>
     <a href="{{ url }}" style="text-decoration:none;background-color:#EA4E4E;color:white;padding:20px;border-radius:20px;margin:20px;display: inline-block;">Panama</a>
 </div>
