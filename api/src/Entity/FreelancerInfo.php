@@ -51,7 +51,7 @@ class FreelancerInfo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget", "specific_freelancer_get", "user_register"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget", "specific_freelancer_get", "user_register", 'user_admin_get'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]

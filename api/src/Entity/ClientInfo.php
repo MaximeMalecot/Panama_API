@@ -32,7 +32,7 @@ class ClientInfo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["client_info_get", "specific_client_get", "user_register"])]
+    #[Groups(["client_info_get", "specific_client_get", "user_register", 'user_admin_get'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -53,7 +53,7 @@ class ClientInfo
 
     #[ORM\OneToOne(inversedBy: 'clientInfo', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["client_info_get", "client_info_patch"])]
+    #[Groups(["client_info_get"])]
     private ?User $client = null;
 
     public function getId(): ?int
