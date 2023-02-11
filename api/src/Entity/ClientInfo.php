@@ -36,19 +36,19 @@ class ClientInfo
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", 'user_admin_get'])]
     private ?string $address = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", 'user_admin_get'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 12, nullable: true)]
-    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", 'user_admin_get'])]
     private ?string $phoneNb = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", 'user_admin_get'])]
     private ?string $description = null;
 
     #[ORM\OneToOne(inversedBy: 'clientInfo', cascade: ['persist', 'remove'])]

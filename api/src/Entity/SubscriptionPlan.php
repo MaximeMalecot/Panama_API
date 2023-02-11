@@ -56,11 +56,11 @@ class SubscriptionPlan
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["subscription_plan_get", "subscription_plan_cget", "subscription_get", "subscription_cget"])]
+    #[Groups(["subscription_plan_get", "subscription_plan_cget", "subscription_get", "subscription_cget", 'user_admin_get'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["subscription_plan_get", "subscription_plan_cget", "subscription_get", "subscription_cget", "subscription_plan_post", "subscription_plan_patch"])]
+    #[Groups(["subscription_plan_get", "subscription_plan_cget", "subscription_get", "subscription_cget", "subscription_plan_post", "subscription_plan_patch", 'user_admin_get'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]

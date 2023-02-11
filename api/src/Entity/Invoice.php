@@ -37,19 +37,19 @@ class Invoice
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(['invoice_cget'])]
+    #[Groups(['invoice_cget', 'user_admin_get'])]
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups(['invoice_cget'])]
+    #[Groups(['invoice_cget', 'user_admin_get'])]
     private ?float $amount = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['invoice_cget'])]
+    #[Groups(['invoice_cget', 'user_admin_get'])]
     private ?string $idStripe = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['invoice_cget'])]
+    #[Groups(['invoice_cget', 'user_admin_get'])]
     private ?string $status = null;
 
     #[ORM\OneToOne(inversedBy: 'invoice', cascade: ['persist', 'remove'])]
