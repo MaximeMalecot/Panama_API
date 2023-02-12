@@ -70,12 +70,12 @@ class PaymentController extends AbstractController
         $em->persist($project);
         $em->flush();
 
-        $url = $_ENV['FRONT_URL'].'/payment';
+        $url = $_ENV['FRONT_URL'].'/redirection/payment';
         $expires_at = ((new \DateTime())->modify('+1 hour'))->getTimeStamp();
 
         $session = $this->stripeClient->checkout->sessions->create([
-            'success_url' => "$url?success",
-            'cancel_url' => "$url?failed",
+            'success_url' => "$url?success=true",
+            'cancel_url' => "$url?success=false",
             'expires_at' => $expires_at,
             'customer' => $user->getStripeId(),
             'line_items' => [[
@@ -147,13 +147,13 @@ class PaymentController extends AbstractController
             ;
         }
 
-        $url = $_ENV['FRONT_URL'].'/subscription';
+        $url = $_ENV['FRONT_URL'].'/redirection/subscription';
         $expires_at = ((new \DateTime())->modify('+1 hour'))->getTimeStamp();
 
         $session = $this->stripeClient->checkout->sessions->create([
-            'success_url' => "$url?success",
+            'success_url' => "$url?success=true",
             'customer' => $user->getStripeId(),
-            'cancel_url' => "$url?failed",
+            'cancel_url' => "$url?success=failed",
             'expires_at' => $expires_at,
             'mode' => 'subscription',
             'line_items' => [[
