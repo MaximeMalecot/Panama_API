@@ -48,7 +48,7 @@ class Subscription
     private ?string $stripeId = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    #[Groups(["subscription_get", "subscription_cget"])]
+    #[Groups(["subscription_get", "subscription_cget", 'user_get'])]
     private ?bool $isActive = false;
 
     #[ORM\OneToOne(inversedBy: 'subscription', cascade: ['persist', 'remove'])]

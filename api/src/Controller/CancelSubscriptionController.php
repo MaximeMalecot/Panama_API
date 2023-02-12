@@ -25,6 +25,6 @@ class CancelSubscriptionController extends AbstractController
         $stripe_customer = $this->stripeClient->customers->retrieve($user->getStripeId(), [ 'expand' => ['subscriptions'] ]);
         $subscription = $stripe_customer->subscriptions->data[0];
         $this->stripeClient->subscriptions->cancel($subscription->id);
-        return $this->json(204);
+        return $this->json(["message" => "subscription canceled"], 204);
     }
 }

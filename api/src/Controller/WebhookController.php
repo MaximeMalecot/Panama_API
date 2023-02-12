@@ -77,6 +77,7 @@ class WebhookController extends AbstractController
                     $subscription->setIsActive(false);
                     $user->setRoles(['ROLE_FREELANCER']);
                     $em->flush();
+                    $userMailer->sendRoleElevation($user, 'Souscription annulée avec succès. Vous avez perdu certains privilèges sur la plateforme.');
                     return $this->json('Subscription canceled', 204);
                 default:
                     return $this->json('Unhandled eventType', 400);
