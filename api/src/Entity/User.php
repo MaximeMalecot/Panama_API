@@ -190,11 +190,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $resetPwdToken = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_cget", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get"])]
+    #[Groups(["user_get", "user_cget", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get", "specific_freelancer_get"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_cget", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get"])]
+    #[Groups(["user_get", "user_cget", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get", "specific_freelancer_get"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
