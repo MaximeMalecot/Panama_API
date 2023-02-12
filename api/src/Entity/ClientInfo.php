@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ClientInfoRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource]
 #[Get(
@@ -32,28 +33,29 @@ class ClientInfo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["client_info_get", "specific_client_get", "user_register"])]
+    #[Groups(["client_info_get", "specific_client_get", "user_register", 'user_get', "project_full_get"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", 'user_get', "project_full_get"])]
     private ?string $address = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", 'user_get', "project_full_get"])]
     private ?string $city = null;
 
     #[ORM\Column(length: 12, nullable: true)]
-    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
+    #[Assert\Regex(pattern: "/^[0-9]{10}$/")]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", 'user_get', "project_full_get"])]
     private ?string $phoneNb = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["client_info_get", "client_info_patch", "specific_client_get"])]
+    #[Groups(["client_info_get", "client_info_patch", "specific_client_get", 'user_get', "project_full_get"])]
     private ?string $description = null;
 
     #[ORM\OneToOne(inversedBy: 'clientInfo', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["client_info_get", "client_info_patch"])]
+    #[Groups(["client_info_get"])]
     private ?User $client = null;
 
     public function getId(): ?int

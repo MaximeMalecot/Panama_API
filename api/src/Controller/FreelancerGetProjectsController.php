@@ -1,15 +1,15 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\Project;
-use App\Entity\Proposition;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[AsController]
-class PropositionPostController extends AbstractController
+class FreelancerGetProjectsController extends AbstractController
 {
     private RequestStack $requestStack;
     private EntityManagerInterface $em;
@@ -18,13 +18,10 @@ class PropositionPostController extends AbstractController
         $this->requestStack = $requestStack;
         $this->em = $em;
     }
-    public function __invoke(Project $project)
+    public function __invoke(User $data)
     {
-        $proposition = (new Proposition())
-            ->setProject($project)
-            ->setFreelancer($this->getUser());
-        $this->em->persist($proposition);
-        $this->em->flush();
-        return $proposition;
+        $status = $this->requestStack->getCurrentRequest()->get('status');
+        $projects = $this->em->getRepository(Project::class)->getFreelancerProjects($data, $status);
+        return $projects;
     }
 }

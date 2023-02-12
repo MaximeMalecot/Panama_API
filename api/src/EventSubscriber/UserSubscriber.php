@@ -29,6 +29,11 @@ final class UserSubscriber implements EventSubscriberInterface
         if(!$user instanceof User || (Request::METHOD_POST !== $method && Request::METHOD_PATCH !== $method)){
             return;
         }
+        if($user->getOldPassword()){
+            if(!$this->encoder->isPasswordValid($user, $user->getOldPassword())){
+                throw new \Exception('Old password is not valid');
+            }
+        }
         if($user->getPlainPassword()){
             $user->setPassword($this->encoder->hashPassword($user, $user->getPlainPassword()));
         }

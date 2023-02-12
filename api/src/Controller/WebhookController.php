@@ -7,10 +7,14 @@ use App\Entity\User;
 use App\Entity\Invoice;
 use App\Entity\Project;
 use Stripe\StripeClient;
+use App\Service\UserMailer;
 use App\Repository\UserRepository;
+use Symfony\Component\Mime\Address;
 use App\Repository\InvoiceRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,7 +31,7 @@ class WebhookController extends AbstractController
     }
 
     #[Route('/stripe', name: 'stripe_payment')]
-    public function stripePayment(Request $request, EntityManagerInterface $em, InvoiceRepository $invoiceRepository, UserRepository $userRepository)
+    public function stripePayment(Request $request, EntityManagerInterface $em, InvoiceRepository $invoiceRepository, UserRepository $userRepository, UserMailer $userMailer)
     {
         $webhookSecret = $_ENV['STRIPE_WH_SK'];
         $signature = $request->headers->get('stripe-signature');
@@ -60,6 +64,7 @@ class WebhookController extends AbstractController
                     $user->setRoles(['ROLE_FREELANCER_PREMIUM']);
                     $subscription->setIsActive(true);
                     $em->flush();
+                    $userMailer->sendRoleElevation($user, "Merci de vous être abonné à notre plateforme ! Vous pourrez maintenat vous positionner sur un projet !");
                     return $this->json('Subscription activated', 204);
                 case 'invoice.payment_failed':
                 case 'customer.subscription.deleted':
@@ -72,6 +77,7 @@ class WebhookController extends AbstractController
                     $subscription->setIsActive(false);
                     $user->setRoles(['ROLE_FREELANCER']);
                     $em->flush();
+                    $userMailer->sendRoleElevation($user, 'Souscription annulée avec succès. Vous avez perdu certains privilèges sur la plateforme.');
                     return $this->json('Subscription canceled', 204);
                 default:
                     return $this->json('Unhandled eventType', 400);
@@ -82,7 +88,7 @@ class WebhookController extends AbstractController
     }
 
     #[Route('/kyc_verification/{id}', name: 'kyc_verification', methods: ['POST'])]
-    public function kycVerification(Request $request, EntityManagerInterface $em, UserRepository $userRepository){
+    public function kycVerification(Request $request, EntityManagerInterface $em, UserRepository $userRepository, UserMailer $userMailer){
         $validStatus = ['success', 'failed'];
         $userId = $request->get("id");
         $status = $request->query->get("status");
@@ -103,6 +109,9 @@ class WebhookController extends AbstractController
         if($status === 'failed') return $this->json(200);
         $user->getFreelancerInfo()->setIsVerified(true);
         $em->flush();
+
+        $userMailer->sendRoleElevation($user, "Votre identité a été vérifiée, vous pouvez désormais accéder à plus de fonctionnalitées sur notre plateforme.");
+
         return $this->json(200);
     }
 

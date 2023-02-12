@@ -64,7 +64,7 @@ class ProjectRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
-    public function hasCommonProject(User $client, User $freelancer){
+    public function hasCommonVerifiedProject(User $client, User $freelancer){
         $qb = $this->createQueryBuilder("p");
         $v = $qb->where("p.owner = :cId")
             ->innerJoin("p.propositions", "pr")
@@ -80,5 +80,75 @@ class ProjectRepository extends ServiceEntityRepository
             return true;
         }
         return false;
+    }
+
+    public function hasCommonProject(User $client, User $freelancer){
+        $qb = $this->createQueryBuilder("p");
+        $v = $qb->where("p.owner = :cId")
+            ->innerJoin("p.propositions", "pr")
+            ->andWhere("pr.freelancer = :fId" )
+            ->setParameters([ 
+                "cId" => $client->getId(),
+                "fId" => $freelancer->getId()
+            ])
+            ->getQuery()
+            ->getResult();
+        if(count($v) > 0){
+            return true;
+        }
+        return false;
+    }
+
+    public function hasCommonPastProject(User $client, User $freelancer){
+        $qb = $this->createQueryBuilder("p");
+        $v = $qb->where("p.owner = :cId")
+            ->innerJoin("p.propositions", "pr")
+            ->andWhere("pr.freelancer = :fId" )
+            ->andWhere("pr.status = 'ACCEPTED'")
+            ->andWhere("p.status = 'ENDED'")
+            ->setParameters([ 
+                "cId" => $client->getId(),
+                "fId" => $freelancer->getId()
+            ])
+            ->getQuery()
+            ->getResult();
+        if(count($v) > 0){
+            return true;
+        }
+        return false;
+
+    }
+
+    public function isOnProject(User $freelancer, Project $projet){
+        $qb = $this->createQueryBuilder("p");
+        $v = $qb->where("p = :pId")
+            ->innerJoin("p.propositions", "pr")
+            ->andWhere("pr.freelancer = :fId" )
+            ->andWhere("pr.status = 'ACCEPTED'")
+            ->setParameters([ 
+                "pId" => $projet->getId(),
+                "fId" => $freelancer->getId()
+            ])
+            ->getQuery()
+            ->getResult();
+        if(count($v) > 0){
+            return true;
+        }
+        return false;
+    }
+
+    public function getFreelancerProjects(User $user, array $status=null){
+        $qb = $this->createQueryBuilder("p");
+        $qb->innerJoin("p.propositions", "pr")
+            ->andWhere("pr.freelancer = :fId" )
+            ->andWhere("pr.status = 'ACCEPTED'")
+            ->setParameters([ 
+                "fId" => $user->getId()
+            ]);
+        if($status != null){
+            $qb->andWhere("p.status IN (:status)")
+                ->setParameter("status", $status);
+        }
+        return $qb->getQuery()->getResult();
     }
 }

@@ -42,6 +42,10 @@ class RegisterController extends AbstractController
                  ->setVerifyEmailToken(bin2hex(random_bytes(32)));
         $user->setPassword($this->encoder->hashPassword($user, $user->getPlainPassword()));
 
+        if( !in_array("ROLE_CLIENT", $roles) && !in_array("ROLE_FREELANCER", $roles) || in_array("ROLE_ADMIN", $roles) || in_array("ROLE_FREELANCER_PREMIUM", $roles)){
+            throw $this->createNotFoundException('Unknown role');
+        }
+
         if( in_array("ROLE_CLIENT", $roles) ){
             $profile = (new ClientInfo())->setClient($user);
             $this->em->persist($profile);
@@ -57,8 +61,11 @@ class RegisterController extends AbstractController
             ->to($email)
             ->subject('Verify your account')
             ->htmlTemplate('mail/Verify-account.html.twig')
-            ->context(['name'=> $user->getName(). " ".$user->getSurname(),
-                        'token' => $user->getVerifyEmailToken()]);
+            ->context([
+                'name'=> $user->getName(). " ".$user->getSurname(),
+                'token' => $user->getVerifyEmailToken(),
+                'url' => $_ENV['FRONT_URL']
+            ]);
         $mailer->send($emailconfig);
 
 

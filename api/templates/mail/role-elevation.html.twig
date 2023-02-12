@@ -1,0 +1,12 @@
+<div style="width: 500px;margin: auto;background-color:#f4f4f4 ;padding: 40px;">
+    <h1>Des modifications ont été apportées à votre compte !</h1>
+
+    <p>Bonjour {{ name }},</p>
+    {% if text is defined and text is not null %}
+        <p>{{ text }}</p>
+    {% else %}
+        <p>Des modifications apportées à votre compte ont modifié vos droits d'accès !</p>
+    {% endif %}
+    <p>N'oubliez pas de vous reconnecter pour charger vos nouvelles fonctionnalités.</p>
+    <a href="{{ url }}" style="text-decoration:none;background-color:#EA4E4E;color:white;padding:20px;border-radius:20px;margin:20px;display: inline-block;">Panama</a>
+</div>

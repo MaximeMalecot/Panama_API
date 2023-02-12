@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\Collection;
 use App\Repository\FreelancerInfoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource]
 #[Get(
@@ -24,7 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[Patch(
-    security: "is_granted('ROLE_ADMIN') or (object.getFreelancer() === user and is_granted('ROLE_FREELANCER'))",
+    security: "is_granted('ROLE_ADMIN') or (is_granted('ROLE_FREELANCER') and object.getFreelancer() === user)",
     normalizationContext: [
         'groups' => ["freelancer_info_get"]
     ],
@@ -51,27 +52,28 @@ class FreelancerInfo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget", "specific_freelancer_get", "user_register"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget", "specific_freelancer_get", "user_register", 'user_get'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget", "user_register"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget", "user_register", 'user_get'])]
     private ?bool $isVerified = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch", 'user_get'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 12, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
+    #[Assert\Regex(pattern: "/^[0-9]{10}$/")]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch", 'user_get'])]
     private ?string $phoneNb = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch", 'user_get'])]
     private ?string $address = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch"])]
+    #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch", 'user_get'])]
     private ?string $city = null;
 
     #[ORM\OneToOne(inversedBy: 'freelancerInfo', cascade: ['persist', 'remove'])]

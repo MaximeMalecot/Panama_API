@@ -15,12 +15,14 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Controller\RegisterController;
 use ApiPlatform\Metadata\GetCollection;
 use App\State\UserVerifyEmailProcessor;
+use App\Controller\ReviewPostController;
 use App\Entity\Traits\TimestampableTrait;
 use App\State\UserResetPasswordProcessor;
 use App\Controller\ResetPasswordController;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints\Email;
+use App\Controller\FreelancerGetProjectsController;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -32,28 +34,36 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[Get(
     security: 'is_granted("ROLE_ADMIN") or object == user',
     normalizationContext: [
-        'groups' => ['user_get']
+        'groups' => ['user_get', 'timestamp']
     ]
 )]
 #[Get(
-    security: "is_granted('ROLE_ADMIN') or object == user",
+    security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT') and object == user",
     uriTemplate: '/users/{id}/projects',
     normalizationContext: [
         'groups' => ['user_get_projects']
     ]
 )]
 #[Get(
+    security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_FREELANCER') and object == user",
+    uriTemplate: '/users/{id}/freelancer/projects',
+    controller: FreelancerGetProjectsController::class,
+    normalizationContext: [
+        'groups' => ['project_freelancer_own']
+    ]
+)]
+#[Get(
     security: 'is_granted("GET_CLIENT", object)',
     uriTemplate: '/users/clients/{id}',
     normalizationContext: [
-        'groups' => ['user_get', 'specific_client_get']
+        'groups' => ['specific_client_get']
     ]
 )]
 #[Get(
     security: 'is_granted("GET_FREELANCER", object)',
     uriTemplate: '/users/freelancer/{id}',
     normalizationContext: [
-        'groups' => ['user_get', 'specific_freelancer_get']
+        'groups' => ['specific_freelancer_get']
     ]
 )]
 #[Get(
@@ -80,6 +90,16 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     security: "is_granted('ROLE_ADMIN') or object == user",
     denormalizationContext: [
         'groups' => ['user_modify']
+    ],
+    normalizationContext: [
+        'groups' => ['user_get']
+    ]
+)]
+#[Patch(
+    uriTemplate: '/users/modify_password/{id}', 
+    security: "object == user",
+    denormalizationContext: [
+        'groups' => ['user_modify_pwd']
     ],
     normalizationContext: [
         'groups' => ['user_get']
@@ -120,6 +140,14 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         'groups' => ['user_register']
     ]
 )]
+#[Post(
+    uriTemplate: '/users/{id}/reviews',
+    security: "is_granted('REVIEW_FREELANCER', object)",
+    controller: ReviewPostController::class,
+    normalizationContext: [
+        'groups' => ['review_get']
+    ],
+)]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity('email', message: 'Email déjà utilisé')]
@@ -130,18 +158,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
     #[NotBlank()]
     #[NotNull()]
     #[Email()]
-    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request",  "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request",  "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_modify", "invoice_get", "project_full_get", "specific_freelancer_get" ])]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(["user_write_register", "user_get", "user_register", "client_info_get"])]
+    #[Groups(["user_write_register", "user_cget",  "user_get", "user_register", "client_info_get"])]
     private array $roles = [];
 
     /**
@@ -151,9 +179,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // #[Regex("/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/i", message: "Must be minimum eight characters, at least one letter and one number ")]
     private ?string $password = null;
 
-    #[Groups(["user_changePwd", "user_write_register"])]
+    #[Groups(["user_changePwd", "user_write_register", "user_modify_pwd"])]
     private ?string $plainPassword = null;
 
+    #[Groups(["user_modify_pwd"])]
     private ?string $oldPassword = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -161,11 +190,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $resetPwdToken = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
+    #[Groups(["user_get", "user_cget", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get", "specific_freelancer_get"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects"])]
+    #[Groups(["user_get", "user_cget", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get", "specific_freelancer_get"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
@@ -173,7 +202,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $isVerified = false;
 
     #[ORM\OneToOne(mappedBy: 'client', cascade: ['persist', 'remove'])]
-    #[Groups(["user_get", "user_register", "specific_client_get"])]
+    #[Groups(["user_get", "user_register", "specific_client_get", "project_full_get"])]
     private ?ClientInfo $clientInfo = null;
 
     #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
@@ -185,10 +214,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $createdProjects;
 
     #[ORM\OneToMany(mappedBy: 'freelancer', targetEntity: Proposition::class, orphanRemoval: true)]
-    #[Groups(["user_get_propositions"])]
+    #[Groups(["user_get_propositions", "user_get"])]
     private Collection $propositions;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Invoice::class, orphanRemoval: true)]
+    #[Groups(["user_get"])]
     private Collection $invoices;
 
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: SocialLink::class, orphanRemoval: true)]
@@ -201,6 +231,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $verifyEmailToken = null;
 
     #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]
+    #[Groups(['user_get'])]
     private ?Subscription $subscription = null;
 
     #[ORM\Column(length: 255, nullable: true)]

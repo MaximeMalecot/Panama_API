@@ -44,11 +44,11 @@ class Subscription
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["subscription_get", "subscription_cget"])]
+    #[Groups(["subscription_get", "subscription_cget", 'user_get'])]
     private ?string $stripeId = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    #[Groups(["subscription_get", "subscription_cget"])]
+    #[Groups(["subscription_get", "subscription_cget", 'user_get'])]
     private ?bool $isActive = false;
 
     #[ORM\OneToOne(inversedBy: 'subscription', cascade: ['persist', 'remove'])]
@@ -58,7 +58,7 @@ class Subscription
 
     #[ORM\ManyToOne(inversedBy: 'subscriptions')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["subscription_get", "subscription_cget"])]
+    #[Groups(["subscription_get", "subscription_cget", 'user_get'])]
     private ?SubscriptionPlan $plan = null;
 
     public function __construct()

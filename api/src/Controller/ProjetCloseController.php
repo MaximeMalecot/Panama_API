@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[AsController]
-class PropositionPostController extends AbstractController
+class ProjetCloseController extends AbstractController
 {
     private RequestStack $requestStack;
     private EntityManagerInterface $em;
@@ -20,11 +20,8 @@ class PropositionPostController extends AbstractController
     }
     public function __invoke(Project $project)
     {
-        $proposition = (new Proposition())
-            ->setProject($project)
-            ->setFreelancer($this->getUser());
-        $this->em->persist($proposition);
+        $project->setStatus(Project::STATUS['ENDED']);
         $this->em->flush();
-        return $proposition;
+        return $project;
     }
 }

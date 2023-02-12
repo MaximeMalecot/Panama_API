@@ -29,7 +29,6 @@ class PropositionVoter extends Voter
         if (!$user instanceof UserInterface) {
             return false;
         }
-        dump(in_array("ROLE_ADMIN", $user->getRoles()) || (in_array("ROLE_CLIENT", $user->getRoles()) && $subject->getStatus() === "AWAITING" && $subject->getProject()->getStatus() === "ACTIVE" && $subject->getProject()->getOwner() === $user));
         switch ($attribute) {
             case self::MODIFY_PROPOSITION:
                 return in_array("ROLE_ADMIN", $user->getRoles()) || (in_array("ROLE_CLIENT", $user->getRoles()) && $subject->getStatus() === "AWAITING" && $subject->getProject()->getStatus() === "ACTIVE" && $subject->getProject()->getOwner() === $user);

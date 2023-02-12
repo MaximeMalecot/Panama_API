@@ -18,8 +18,6 @@ class PropositionGetOwnController extends AbstractController
     {
         $user = $this->getUser();
         $proposition = $this->em->getRepository(Proposition::class)->findOneBy(['project' => $data, 'freelancer' => $user]);
-        return $this->json([
-            'proposition' => $proposition
-        ],200);
+        return $proposition;
     }
 }

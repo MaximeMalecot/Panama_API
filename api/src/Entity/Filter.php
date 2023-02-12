@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use App\Repository\FilterRepository;
@@ -17,7 +18,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
-#[ApiFilter(SearchFilter::class,properties: ['name' => 'exact','type' => 'exact'])]
+#[ApiFilter(SearchFilter::class,properties: ['name' => 'partial','type' => 'exact'])]
 #[Get(
     security: "is_granted('ROLE_FREELANCER') or is_granted('ROLE_CLIENT')",
     normalizationContext: [
@@ -48,6 +49,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'groups' => ['filter_post']
     ]
 )]
+#[Delete(
+    security: "is_granted('ROLE_ADMIN')",
+)]
 #[ORM\Entity(repositoryClass: FilterRepository::class)]
 class Filter
 {
@@ -56,18 +60,18 @@ class Filter
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["filter_get", "filter_cget"])]
+    #[Groups(["filter_get", "filter_cget", "project_cget"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["filter_get", "filter_cget", "filter_post"])]
+    #[Groups(["filter_get", "filter_cget", "filter_post", "project_cget", "project_get", "project_freelancer_own"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["filter_get", "filter_cget", "filter_post"])]
+    #[Groups(["filter_get", "filter_cget", "filter_post", "project_freelancer_own"])]
     private ?string $type = null;
 
-    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'filters', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToMany(targetEntity: Project::class, inversedBy: 'filters', cascade: ['persist'])]
     #[Groups(["filter_get"])]
     private Collection $projects;
 
@@ -100,10 +104,8 @@ class Filter
 
     public function setType(?string $type): self
     {
-        if(!in_array($type, ["techno", "other"])){
-            $type = "other";
-        }
         $this->type = $type;
+        
         return $this;
     }
 
