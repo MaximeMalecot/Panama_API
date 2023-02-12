@@ -102,7 +102,7 @@ class Project
 
     #[ORM\ManyToOne(inversedBy: 'createdProjects')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["project_freelancer_own"])]
+    #[Groups(["project_freelancer_own", "project_get"])]
     private ?User $owner = null;
 
     #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects', cascade: ['persist'])]
