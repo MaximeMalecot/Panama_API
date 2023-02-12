@@ -158,7 +158,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_get"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
@@ -190,11 +190,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $resetPwdToken = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_cget", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own"])]
+    #[Groups(["user_get", "user_cget", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["user_get", "user_cget", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own"])]
+    #[Groups(["user_get", "user_cget", "user_modify", "user_write_register", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get"])]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
@@ -202,7 +202,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $isVerified = false;
 
     #[ORM\OneToOne(mappedBy: 'client', cascade: ['persist', 'remove'])]
-    #[Groups(["user_get", "user_register", "specific_client_get"])]
+    #[Groups(["user_get", "user_register", "specific_client_get", "project_full_get"])]
     private ?ClientInfo $clientInfo = null;
 
     #[ORM\OneToOne(mappedBy: 'freelancer', cascade: ['persist', 'remove'])]

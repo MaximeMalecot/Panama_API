@@ -102,6 +102,24 @@ class ProjectRepository extends ServiceEntityRepository
 
     }
 
+    public function isOnProject(User $freelancer, Project $projet){
+        $qb = $this->createQueryBuilder("p");
+        $v = $qb->where("p = :pId")
+            ->innerJoin("p.propositions", "pr")
+            ->andWhere("pr.freelancer = :fId" )
+            ->andWhere("pr.status = 'ACCEPTED'")
+            ->setParameters([ 
+                "pId" => $projet->getId(),
+                "fId" => $freelancer->getId()
+            ])
+            ->getQuery()
+            ->getResult();
+        if(count($v) > 0){
+            return true;
+        }
+        return false;
+    }
+
     public function getFreelancerProjects(User $user, array $status=null){
         $qb = $this->createQueryBuilder("p");
         $qb->innerJoin("p.propositions", "pr")

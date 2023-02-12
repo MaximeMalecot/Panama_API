@@ -35,6 +35,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[Get(
+    uriTemplate: '/projects/{id}/full',
+    security: "is_granted('ROLE_FREELANCER_PREMIUM')",
+    normalizationContext: [
+        'groups' => ['project_get', 'project_full_get']
+    ]
+)]
+#[Get(
     uriTemplate: '/projects/{id}/propositions',
     security: "is_granted('ROLE_ADMIN') or object.getOwner() === user",
     normalizationContext: [
@@ -102,7 +109,7 @@ class Project
 
     #[ORM\ManyToOne(inversedBy: 'createdProjects')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["project_freelancer_own", "project_get"])]
+    #[Groups(["project_freelancer_own", "project_full_get"])]
     private ?User $owner = null;
 
     #[ORM\ManyToMany(targetEntity: Filter::class, mappedBy: 'projects', cascade: ['persist'])]
@@ -126,7 +133,7 @@ class Project
     private ?int $maxPrice = null;
 
     #[ORM\Column(length: 255, options: ['default' => 'CREATED'])]
-    #[Groups(["project_get_own", "project_get_propositions", "user_get_projects", "project_cget", "project_freelancer_own"])]
+    #[Groups(["project_get", "project_get_own", "project_get_propositions", "user_get_projects", "project_cget", "project_freelancer_own"])]
     private ?string $status = "CREATED";
 
     #[ORM\Column]
