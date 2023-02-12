@@ -17,7 +17,7 @@ class UserMailer
         $email = (new TemplatedEmail())
             ->from(new Address('panama@easylocmoto.fr','Panama Agency'))
             ->to($user->getEmail())
-            ->subject('Information verified')
+            ->subject('Modification de votre compte')
             ->htmlTemplate('mail/role-elevation.html.twig')
             ->context([
                 'name'=> $user->getName(). " ".$user->getSurname(),
