@@ -56,14 +56,14 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     security: 'is_granted("GET_CLIENT", object)',
     uriTemplate: '/users/clients/{id}',
     normalizationContext: [
-        'groups' => ['user_get', 'specific_client_get']
+        'groups' => ['specific_client_get']
     ]
 )]
 #[Get(
     security: 'is_granted("GET_FREELANCER", object)',
     uriTemplate: '/users/freelancer/{id}',
     normalizationContext: [
-        'groups' => ['user_get', 'specific_freelancer_get']
+        'groups' => ['specific_freelancer_get']
     ]
 )]
 #[Get(
@@ -165,7 +165,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[NotBlank()]
     #[NotNull()]
     #[Email()]
-    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request",  "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_modify", "invoice_get", "project_full_get"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request",  "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_modify", "invoice_get", "project_full_get", "specific_freelancer_get" ])]
     private ?string $email = null;
 
     #[ORM\Column]
