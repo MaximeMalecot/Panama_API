@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ClientInfoRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource]
 #[Get(
@@ -44,6 +45,7 @@ class ClientInfo
     private ?string $city = null;
 
     #[ORM\Column(length: 12, nullable: true)]
+    #[Assert\Regex(pattern: "/^[0-9]{10}$/")]
     #[Groups(["client_info_get", "client_info_patch", "specific_client_get", 'user_get', "project_full_get"])]
     private ?string $phoneNb = null;
 
