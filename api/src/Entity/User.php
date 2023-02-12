@@ -158,7 +158,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_resetPwd_request", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get"])]
+    #[Groups(["user_cget", "user_get", "user_write_register", "user_resetPwd", "user_register", "subscription_plan_get", "subscription_get", "subscription_cget", "freelancer_info_get", "project_get_propositions", "client_info_get", "user_get_projects", "invoice_get", "project_freelancer_own", "project_full_get"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
