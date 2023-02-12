@@ -40,7 +40,7 @@ class UserVoter extends Voter
                 return $this->canGetInfo($user, $subject);
                 break;
             case self::GET_FREELANCER:
-                return $this->canGetInfo($subject, $user);
+                return $this->canGetInfo($subject, $user, $security = "soft");
                 break;
             case self::REVIEW_FREELANCER:
                 return $this->canReviewFreelancer($user, $subject);
@@ -50,14 +50,14 @@ class UserVoter extends Voter
         return false;
     }
 
-    private function canGetInfo(User $freelancer, User $client){
+    private function canGetInfo(User $freelancer, User $client, $security = "hard"){
         if( in_array("ROLE_ADMIN", $freelancer->getRoles()) ) return true;
         //if( $client->getId() === $freelancer->getId() )      return true;
         
         if( in_array('ROLE_CLIENT', $client->getRoles()) 
             && in_array('ROLE_FREELANCER_PREMIUM', $freelancer->getRoles()) 
         ){
-            return $this->projectRepository->hasCommonProject($client, $freelancer );
+            return $security === "hard" ? $this->projectRepository->hasCommonVerifiedProject($client, $freelancer ) :  $this->projectRepository->hasCommonProject($client, $freelancer);
         }
         return false;
     }

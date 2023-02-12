@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\Collection;
 use App\Repository\FreelancerInfoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource]
 #[Get(
@@ -63,6 +64,7 @@ class FreelancerInfo
     private ?string $description = null;
 
     #[ORM\Column(length: 12, nullable: true)]
+    #[Assert\Regex(pattern: "/^[0-9]{10}$/")]
     #[Groups(["freelancer_info_get", "freelancer_info_cget",  "specific_freelancer_get", "freelancer_info_patch", 'user_get'])]
     private ?string $phoneNb = null;
 
