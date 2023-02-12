@@ -50,7 +50,7 @@ We are using Cloud Build for creating our images and deploying them on GCloud Ru
 
 We are using Cloud SQL for our database. (tbd: for cost usage might switch to private VPS host for database)
 
-Docker images can be found [here](eu.gcr.io/challenge-s1/challenge_s1_g6_api)
+Docker images can be found [here](https://eu.gcr.io/challenge-s1/challenge_s1_g6_api)
 
 There is an image for the API-Platform api named challenge_s1_g6_api \
 And one for the fake api used to verify freelancers info named challenge-s1-g6-kyc-api
