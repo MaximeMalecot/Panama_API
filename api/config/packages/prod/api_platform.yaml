@@ -11,10 +11,6 @@ api_platform:
             JWT:
                 name: Authorization
                 type: header
-    # Enabling only JSON-LD and JSON formats while disabling HTML format
-    formats:
-        json:
-            mime_types: ['application/json']
     # Disabling the displaying of the API documentation 
     enable_swagger_ui: false
     enable_re_doc: false

@@ -17,10 +17,10 @@ class SubscriptionPlanFixtures extends Fixture
         $faker = Factory::create();
         $object=(new SubscriptionPlan)
             ->setName("Dummy Plan | don't use it")
-            ->setDescription($faker->text)
+            ->setDescription("Not working, don\'t use it")
             ->setColor($faker->hexColor)
             ->setPrice(50)
-            ->setStripeId('price_1MRvKsDqNqmwdP0kJKPRXFVC')
+            ->setStripeId('price_dummy')
         ;
         $manager->persist($object);
         $manager->flush();

@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\SubscriptionPlanService;
 
 #[AsController]
 class SubscriptionPlanPostController extends AbstractController
@@ -15,34 +16,34 @@ class SubscriptionPlanPostController extends AbstractController
     private RequestStack $requestStack;
     private EntityManagerInterface $em;
 
-    public function __construct(RequestStack $requestStack, EntityManagerInterface $em){
+    public function __construct(RequestStack $requestStack, EntityManagerInterface $em, SubscriptionPlanService $subscriptionPlanService){
         $this->stripeClient = new StripeClient($_ENV['STRIPE_SK']);
         $this->requestStack = $requestStack;
         $this->em = $em;
+        $this->subscriptionPlanService = $subscriptionPlanService;
     }
     public function __invoke()
     {
         $data = json_decode($this->requestStack->getCurrentRequest()->getContent());
-        if(!isset($data->name) || !isset($data->description) || !isset($data->color) || !isset($data->stripeId)){
+        if(!isset($data->name) || !isset($data->description) || !isset($data->color) || !isset($data->price)){
             return $this->json("Missing data", 400);
         }
-        $subscription = $this->em->getRepository(SubscriptionPlan::class)->findOneBy(['stripeId' => $data->stripeId]);
-        if($subscription){
-            return $this->json("Stripe price already used", 400);
+
+        if( !is_numeric($data->price) && floatval($data->price) < 1){
+            return $this->json("Price must be greater than 0", 400);
         }
+        
         try{
-            $price = $this->stripeClient->prices->retrieve($data->stripeId);
+            $plan = $this->subscriptionPlanService->createSubscriptionPlan($data->name, $data->price);
+            if(!$plan){
+                throw new \Exception('An error occurred, could not create this plan');
+            }
+            $plan->setColor($data->color);
+            $plan->setDescription($data->description);
         } catch(\Exception $e){
-            return $this->json("Stripe price not found", 404);
+            return $this->json($e->getMessage(), 404);
         }
-        $subscriptionPlan = (new SubscriptionPlan())
-            ->setName($data->name)
-            ->setDescription($data->description)
-            ->setColor($data->color)
-            ->setPrice($price->unit_amount/100)
-            ->setStripeId($data->stripeId);
-        $this->em->persist($subscriptionPlan);
         $this->em->flush();
-        return $subscriptionPlan;
+        return $plan;
     }
 }

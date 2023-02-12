@@ -28,10 +28,10 @@ class SubscriptionPlanService
             throw new \Exception('An error occurred, could not create this product');
         }
 
-        $plan = $this->stripeClient->plans->create([
-            'amount' => intval($price)*100,
+        $plan = $this->stripeClient->prices->create([
+            'unit_amount' => floatval($price)*100,
             'currency' => 'eur',
-            'interval' => 'month',
+            'recurring' => ['interval' => 'month'],
             'product' => $product,
         ]);
 
@@ -40,7 +40,7 @@ class SubscriptionPlanService
         }
 
         $subscriptionPlan = $this->savePlan($plan->id, $price, $name);
-        if(!$subscriptionPlan){
+        if(!$subscriptionPlan->getId()){
             throw new \Exception('An error occurred, could not save this plan');
         }
         return $subscriptionPlan;
@@ -55,7 +55,7 @@ class SubscriptionPlanService
         return $product->id;
     }
 
-    private function savePlan(string $stripeId, int $price, string $name): bool
+    private function savePlan(string $stripeId, int $price, string $name): ?SubscriptionPlan
     {
         $plan = new SubscriptionPlan();
         $plan->setName($name);
@@ -66,6 +66,6 @@ class SubscriptionPlanService
         $this->manager->persist($plan);
         $this->manager->flush();
 
-        return true;
+        return $plan;
     }
 }
