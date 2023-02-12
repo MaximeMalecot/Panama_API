@@ -28,10 +28,10 @@ class SubscriptionPlanService
             throw new \Exception('An error occurred, could not create this product');
         }
 
-        $plan = $this->stripeClient->plans->create([
-            'amount' => intval($price)*100,
+        $plan = $this->stripeClient->prices->create([
+            'unit_amount' => intval($price)*100,
             'currency' => 'eur',
-            'interval' => 'month',
+            'recurring' => ['interval' => 'month'],
             'product' => $product,
         ]);
 
