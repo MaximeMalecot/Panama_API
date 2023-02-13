@@ -61,6 +61,17 @@ class UserFixtures extends Fixture
         ;
         $manager->persist($object);
 
+        for($i=1; $i<30; $i++){
+            $object=(new User)
+                ->setName('client'.$i)
+                ->setSurname('client'.$i)
+                ->setEmail("client$i@client.com")
+                ->setPassword($pwd)
+                ->setRoles(["ROLE_CLIENT"])
+                ->setIsVerified(true)
+            ;
+            $manager->persist($object);;
+        }
         $manager->flush();
     }
 }
